@@ -49,8 +49,9 @@ cv:
           - Developed graph neural network methods for multi-class dementia classification and
             continuous disease-progression modeling using multi-cohort neuroimaging data
             (ADNI, NACC, and in-house LBD datasets).
-          - Authored first-author papers at MICCAI 2025, MICCAI 2026 (early accept), and in
-            Alzheimer's & Dementia, and co-authored work across MICCAI, ISBI, and other venues.
+          - Authored first-author papers at MICCAI 2025 and MICCAI 2026 (both early accept)
+            and a first-author AAIC abstract in Alzheimer's & Dementia, and co-authored work
+            across MICCAI, ISBI, and other venues.
           - Preprocessed and analyzed multimodal neuroimaging (T1-weighted, diffusion, and
             functional MRI) using FreeSurfer, FSL, SPM12, and CAT12.
           - Contributed to drafting sections of federal research proposals.
