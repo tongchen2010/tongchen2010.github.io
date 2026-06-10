@@ -48,10 +48,10 @@ cv:
         highlights:
           - Developed graph neural network methods for multi-class dementia classification and
             continuous disease-progression modeling using large multi-cohort neuroimaging data.
-          - Built sMRI and DTI preprocessing and analysis pipelines supporting multi-cohort
-            studies across the lab.
-          - Published first-author work at MICCAI and AAIC, and co-authored papers across
-            MICCAI, ISBI, and related venues.
+          - Built sMRI and DTI preprocessing and analysis pipelines for multi-cohort
+            neuroimaging studies.
+          - Published first-author work at MICCAI and AAIC and a co-authored NeuroImage
+            article, plus co-authored papers across MICCAI, ISBI, and related venues.
           - Assisted in preparing NIH grant proposals.
 
       - company: University of North Carolina at Chapel Hill
