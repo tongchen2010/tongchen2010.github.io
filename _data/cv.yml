@@ -48,13 +48,12 @@ cv:
         highlights:
           - Developed graph neural network methods for multi-class dementia classification and
             continuous disease-progression modeling using multi-cohort neuroimaging data
-            (ADNI, NACC, and in-house LBD datasets).
-          - Authored first-author papers at MICCAI 2025 and MICCAI 2026 (both early accept)
-            and a first-author AAIC abstract in Alzheimer's & Dementia, and co-authored work
-            across MICCAI, ISBI, and other venues.
-          - Preprocessed and analyzed multimodal neuroimaging (T1-weighted, diffusion, and
-            functional MRI) using FreeSurfer, FSL, SPM12, and CAT12.
-          - Contributed to drafting sections of federal research proposals.
+            (ADNI, NACC, AABC, HCP, BCP, and in-house LBD cohorts).
+          - Built sMRI and DTI preprocessing and analysis pipelines (FreeSurfer, FSL, SPM12,
+            CAT12) supporting multi-cohort studies across the lab.
+          - Published first-author work at MICCAI and AAIC, and co-authored papers across
+            MICCAI, ISBI, and related venues.
+          - Contributed to writing grant proposals for federally funded research.
 
       - company: University of North Carolina at Chapel Hill
         position: Research Assistant
