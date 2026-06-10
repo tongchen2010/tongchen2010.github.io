@@ -1,0 +1,9 @@
+github_users:
+  - tongchen2010
+
+repo_description_lines_max: 2
+
+github_repos:
+  - tongchen2010/haff
+  - tongchen2010/hilograph
+  - tongchen2010/hcp_myelin_map_v2

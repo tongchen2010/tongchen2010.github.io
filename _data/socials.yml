@@ -1,0 +1,9 @@
+# this file contains the social media links and usernames of the author
+# the socials will be displayed in the order they are defined here
+# for more information, please refer to the documentation of jekyll-socials plugin: https://github.com/george-gca/jekyll-socials
+email: txc5603@mavs.uta.edu # your email address
+cv_pdf: /assets/pdf/tong_chen_cv.pdf # path to your CV PDF file
+github_username: tongchen2010 # your GitHub user name
+# scholar_userid: # your Google Scholar ID — add it once you have your Scholar profile URL
+# linkedin_username: # your LinkedIn user name
+# orcid_id: # your ORCID ID
