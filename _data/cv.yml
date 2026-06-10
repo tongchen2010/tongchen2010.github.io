@@ -1,0 +1,92 @@
+cv:
+  name: Tong Chen
+  label: Ph.D. Candidate in Computer Science
+  email: txc5603@mavs.uta.edu
+  location: Arlington, TX
+  image: ""
+  summary: >-
+    Machine learning for neuroimaging and neurodegenerative disease — Alzheimer's disease and
+    Lewy body dementia — with an emphasis on graph-based representations of brain structure and
+    connectivity, disease-progression modeling, and interpretable, multi-cohort clinical analysis.
+
+  social_networks:
+    - network: GitHub
+      username: tongchen2010
+
+  sections:
+    Education:
+      - institution: The University of Texas at Arlington
+        location: Arlington, TX
+        url: https://www.uta.edu/
+        area: Computer Science (Advisor — Dr. Dajiang Zhu)
+        studyType: Ph.D.
+        start_date: 2023-08
+        end_date: present
+        highlights:
+          - Expected graduation — December 2026.
+
+      - institution: Kennesaw State University
+        location: Kennesaw, GA
+        area: Computer Science
+        studyType: M.S.
+        start_date: 2021-01
+        end_date: 2022-12
+
+      - institution: Kennesaw State University
+        location: Kennesaw, GA
+        area: Computer Science
+        studyType: B.S.
+        start_date: 2012-08
+        end_date: 2018-05
+
+    Experience:
+      - company: The University of Texas at Arlington
+        position: Graduate Research Assistant (Advisor — Dr. Dajiang Zhu)
+        location: Arlington, TX
+        start_date: 2023-08
+        end_date: present
+        highlights:
+          - Developed graph neural network methods for multi-class dementia classification and
+            continuous disease-progression modeling using multi-cohort neuroimaging data
+            (ADNI, NACC, and in-house LBD datasets).
+          - Authored first-author papers at MICCAI 2025 and in Alzheimer's & Dementia, and
+            co-authored work across MICCAI, ISBI, and other venues.
+          - Preprocessed and analyzed multimodal neuroimaging (T1-weighted, diffusion, and
+            functional MRI) using FreeSurfer, FSL, SPM12, and CAT12.
+          - Contributed to drafting sections of federal research proposals.
+
+      - company: University of Nevada, Las Vegas
+        position: Research Assistant (Advisor — Dr. Junggab Son)
+        location: Las Vegas, NV
+        start_date: 2023-03
+        end_date: 2023-05
+        highlights:
+          - Researched interpretability methods for deep learning and generative models.
+
+      - company: Kennesaw State University
+        position: Graduate Research Assistant (Advisors — Dr. Junggab Son, Dr. Jiho Noh)
+        location: Kennesaw, GA
+        start_date: 2021-01
+        end_date: 2022-12
+        highlights:
+          - Researched computer vision, natural language processing, generative models, and
+            security of deep learning algorithms; published at ICMLA 2022.
+
+    Awards:
+      - title: Nominee, College of Engineering & Science Graduate Student Award
+        date: 2026
+        awarder: The University of Texas at Arlington
+
+    Technical Skills:
+      - label: Programming
+        details: Python, MATLAB, LaTeX
+      - label: ML / DL Frameworks
+        details: PyTorch, PyTorch Geometric, scikit-learn
+      - label: Neuroimaging Tools
+        details: FreeSurfer, FSL, SPM12, CAT12
+      - label: Methods
+        details: Graph Neural Networks, Transformers, CNNs, Representation Learning, Domain Adaptation
+
+    Academic Service:
+      - label: Reviewer
+        details: Program Committee Reviewer, PETRA 2026
