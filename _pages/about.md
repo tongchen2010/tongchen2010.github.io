@@ -27,7 +27,7 @@ latest_posts:
 
 I am a Ph.D. candidate in Computer Science at The University of Texas at Arlington, advised by [Dr. Dajiang Zhu](https://www.uta.edu/academics/faculty/profile?username=zhud). I expect to graduate in **December 2026**.
 
-My research develops **machine learning methods for neuroimaging and neurodegenerative disease** — particularly Alzheimer's disease and Lewy body dementia, spanning the full continuum from mild cognitive impairment to dementia. I focus on:
+My research develops **machine learning methods for neuroimaging and neurodegenerative disease** — particularly Alzheimer's disease (AD) and Lewy body dementia (LBD), spanning the full continuum from mild cognitive impairment to dementia. I focus on:
 
 - **Graph-based representations** of brain structure and connectivity (graph neural networks on cortical surfaces and connectomes)
 - **Disease-progression modeling** — continuous staging frameworks that place patients along the cognitive impairment continuum
