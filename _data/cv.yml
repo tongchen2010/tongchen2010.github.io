@@ -47,8 +47,7 @@ cv:
         end_date: present
         highlights:
           - Developed graph neural network methods for multi-class dementia classification and
-            continuous disease-progression modeling using multi-cohort neuroimaging data
-            (ADNI, NACC, AABC, HCP, BCP, and in-house LBD cohorts).
+            continuous disease-progression modeling using large multi-cohort neuroimaging data.
           - Built sMRI and DTI preprocessing and analysis pipelines supporting multi-cohort
             studies across the lab.
           - Published first-author work at MICCAI and AAIC, and co-authored papers across
@@ -96,6 +95,8 @@ cv:
         details: FreeSurfer, FSL, SPM12, CAT12, Connectome Workbench, DSI Studio, MRtrix3, medInria
       - label: Models
         details: Graph Neural Networks, Transformers, CNNs, State-Space Models (Mamba), Multimodal LLMs
+      - label: Datasets
+        details: ADNI, NACC, AABC, HCP, BCP, in-house LBD cohorts
 
     Academic Service:
       - label: Reviewer
