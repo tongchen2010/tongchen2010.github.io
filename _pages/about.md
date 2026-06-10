@@ -33,7 +33,7 @@ My research develops **machine learning methods for neuroimaging and neurodegene
 - **Disease-progression modeling** — continuous staging frameworks that place patients along the cognitive impairment continuum
 - **Interpretable, multi-cohort clinical analysis** using large neuroimaging datasets (ADNI, NACC, and in-house LBD cohorts)
 
-My work has appeared in **MICCAI**, **IEEE ISBI**, and *Alzheimer's & Dementia* (AAIC), including first-author MICCAI papers in 2025 (a unified continuous staging framework for AD and LBD) and 2026 (HiLoGraph, hierarchical-longitudinal brain network representation learning).
+My work has appeared in *NeuroImage*, **MICCAI**, **IEEE ISBI**, and *Alzheimer's & Dementia* (AAIC), including first-author MICCAI papers in 2025 (a unified continuous staging framework for AD and LBD) and 2026 (HiLoGraph, hierarchical-longitudinal brain network representation learning).
 
 Before UTA, I received my M.S. and B.S. in Computer Science from Kennesaw State University, where I worked on computer vision and deep learning with Dr. Junggab Son and Dr. Jiho Noh.
 
