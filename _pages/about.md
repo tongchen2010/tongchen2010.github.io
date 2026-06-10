@@ -29,9 +29,9 @@ I am a Ph.D. candidate in Computer Science at The University of Texas at Arlingt
 
 My research develops **machine learning methods for neuroimaging and neurodegenerative disease** — particularly Alzheimer's disease (AD) and Lewy body dementia (LBD), spanning the full continuum from mild cognitive impairment to dementia. I focus on:
 
-- **Graph-based representations** of brain structure and connectivity (graph neural networks on cortical surfaces and connectomes)
+- **Self-supervised representation learning** for longitudinal brain MRI, including normative modeling of healthy aging
 - **Disease-progression modeling** — continuous staging frameworks that place patients along the cognitive impairment continuum
-- **Interpretable, multi-cohort clinical analysis** using large neuroimaging datasets (ADNI, NACC, and in-house LBD cohorts)
+- **Interpretable, multi-cohort clinical analysis** using large neuroimaging datasets (ADNI, NACC, AABC, HCP, BCP, and in-house LBD cohorts)
 
 My work has appeared in *NeuroImage*, **MICCAI**, **IEEE ISBI**, and *Alzheimer's & Dementia* (AAIC), including first-author MICCAI papers in 2025 (a unified continuous staging framework for AD and LBD) and 2026 (HiLoGraph, hierarchical-longitudinal brain network representation learning).
 
