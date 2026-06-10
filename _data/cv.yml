@@ -53,15 +53,16 @@ cv:
             CAT12) supporting multi-cohort studies across the lab.
           - Published first-author work at MICCAI and AAIC, and co-authored papers across
             MICCAI, ISBI, and related venues.
-          - Contributed to writing grant proposals for federally funded research.
+          - Assisted in preparing NIH grant proposals.
 
       - company: University of North Carolina at Chapel Hill
-        position: Research Assistant
+        position: Research Assistant (Advisor — Dr. Gang Li)
         location: Chapel Hill, NC
         start_date: 2025-05
         end_date: 2025-08
         highlights:
-          - Summer research in neuroimaging and machine learning.
+          - Developed cortical surface-based machine learning methods for brain MRI analysis
+            using Human Connectome Project (HCP) data.
 
       - company: University of Nevada, Las Vegas
         position: Research Assistant (Advisor — Dr. Junggab Son)
@@ -92,9 +93,11 @@ cv:
       - label: ML / DL Frameworks
         details: PyTorch, PyTorch Geometric, scikit-learn
       - label: Neuroimaging Tools
-        details: FreeSurfer, FSL, SPM12, CAT12
+        details: FreeSurfer, FSL, SPM12, CAT12, Connectome Workbench
+      - label: Models
+        details: Graph Neural Networks, Transformers, CNNs, State-Space Models (Mamba), Multimodal LLMs
       - label: Methods
-        details: Graph Neural Networks, Transformers, CNNs, Representation Learning, Domain Adaptation
+        details: Self-Supervised Learning, Representation Learning, Domain Adaptation
 
     Academic Service:
       - label: Reviewer
