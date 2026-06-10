@@ -1,0 +1,164 @@
+%=========================================================================
+%  Tong Chen — Academic CV
+%  Compiles with pdfLaTeX (works directly on Overleaf).
+%  TODO markers (%% <-- ) flag the spots you should fill in / verify.
+%=========================================================================
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.9in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+% --- Section styling: small-caps heading with a rule underneath ---
+\titleformat{\section}{\large\bfseries\scshape}{}{0em}{}[\vspace{-4pt}\titlerule]
+\titlespacing{\section}{0pt}{12pt}{6pt}
+
+% --- List defaults ---
+\setlist[itemize]{leftmargin=1.4em, itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate]{leftmargin=1.8em, itemsep=2pt, topsep=2pt, parsep=0pt}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+% --- Helper: bold left, right-aligned date ---
+\newcommand{\dated}[2]{\textbf{#1}\hfill #2\par}
+
+\begin{document}
+
+%========================= HEADER =========================
+\begin{center}
+  {\LARGE\textbf{Tong Chen}}\\[5pt]
+  470-641-4428 ~|~ \href{mailto:txc5603@mavs.uta.edu}{txc5603@mavs.uta.edu}
+  ~|~ Website: \href{https://tongchen2010.github.io}{tongchen2010.github.io}
+  ~|~ GitHub: \href{https://github.com/tongchen2010}{tongchen2010}
+\end{center}
+
+%========================= RESEARCH INTERESTS =========================
+\section{Research Interests}
+Machine learning for neuroimaging and neurodegenerative disease --- particularly Alzheimer's
+disease and Lewy body dementia (spanning MCI to dementia) --- with an emphasis on graph-based
+representations of brain structure and connectivity, disease-progression modeling, and
+interpretable, multi-cohort clinical analysis.
+
+%========================= EDUCATION =========================
+\section{Education}
+\dated{Ph.D. in Computer Science}{Aug 2023 -- Present (expected Dec 2026)}
+The University of Texas at Arlington \hfill \textit{Advisor: Dr. Dajiang Zhu}\par
+\vspace{4pt}
+\dated{M.S. in Computer Science}{Jan 2021 -- Dec 2022}
+Kennesaw State University\par
+\vspace{4pt}
+\dated{B.S. in Computer Science}{Aug 2012 -- May 2018}
+Kennesaw State University\par
+
+%========================= HONORS & AWARDS =========================
+\section{Honors \& Awards}
+\begin{itemize}
+  \item John Stephen Schuchman Memorial Outstanding PhD Student Scholarship Award,
+        Dept.\ of Computer Science \& Engineering, UT Arlington, 2026
+\end{itemize}
+
+%========================= PUBLICATIONS =========================
+\section{Publications}
+{\small (\textbf{Bold} = author; first / co-first authorship noted.)}
+
+\subsection*{Journal Articles}
+\begin{enumerate}
+  \item \textbf{Tong Chen}, Minheng Chen, Yan Zhuang, Jing Zhang, Lu Zhang, Tianming Liu,
+        Andrew M. Blamire, John-Paul Taylor, Li Su, John T. O'Brien, and Dajiang Zhu.
+        ``Representing the Cognitive Impairment Continuum of Alzheimer's Disease and Lewy
+        Body Dementia with a Novel Finer-Scale Cortical Representation via Disease
+        Embedding Tree.'' \textit{Alzheimer's \& Dementia}, 21, e102179, 2025. \textbf{(First author)}
+  \item Lu Zhang, Junqi Qu, Haotian Ma, \textbf{Tong Chen}, Tianming Liu, and Dajiang Zhu.
+        ``Exploring Alzheimer's Disease: A Comprehensive Brain Connectome-Based Survey.''
+        \textit{Psychoradiology}, kkad033, 2024.
+\end{enumerate}
+
+\subsection*{Refereed Conference Proceedings}
+\begin{enumerate}
+  \item \textbf{Tong Chen}, Minheng Chen, Jing Zhang, Yan Zhuang, Chao Cao, Xiaowei Yu,
+        Yanjun Lyu, Lu Zhang, Li Su, Tianming Liu, and Dajiang Zhu. ``A Unified Continuous
+        Staging Framework for Alzheimer's Disease and Lewy Body Dementia via Hierarchical
+        Anatomical Features.'' \textit{Intl.\ Conf.\ on Medical Image Computing and Computer
+        Assisted Intervention (MICCAI)}, Daejeon, South Korea, 2025. \textbf{(First author)}
+  \item Chao Cao*, \textbf{Tong Chen}*, Nawei Zhao*, Minheng Chen, Minghao Qu, Zhiyuan Zhang,
+        Xin Shi, Xiang Li, Tianming Liu, and Dajiang Zhu. ``Gyral-Sulcal-Net: An Integrated
+        Network Representation of Brain Folding Patterns.'' \textit{IEEE Intl.\ Symposium on
+        Biomedical Imaging (ISBI)}, 2026. \textbf{(Co-first author)}
+  \item Chao Cao, Xiaowei Yu, Lu Zhang, \textbf{Tong Chen}, Yanjun Lyu, Tianming Liu, and
+        Dajiang Zhu. ``Enhancing Group-Wise Consistency in 3-Hinge Gyrus Matching via
+        Anatomical Embedding and Structural Connectivity Optimization.'' \textit{IEEE Intl.\
+        Symposium on Biomedical Imaging (ISBI)}, Athens, Greece, 2024.
+  \item \textbf{Tong Chen}, Jiho Noh, Luke Cranfill, John Morris, and Junggab Son.
+        ``Improving Fashion Attribute Classification Accuracy with Limited Labeled Data
+        Using Transfer Learning.'' \textit{21st IEEE Intl.\ Conf.\ on Machine Learning and
+        Applications (ICMLA)}, Nassau, The Bahamas, 2022. Oral presentation
+        (acceptance rate 32.4\%). \textbf{(First author)}
+\end{enumerate}
+
+%% If you truly have 15+ papers, list the rest here rather than saying "15+" elsewhere.
+
+%========================= PRESENTATIONS =========================
+\section{Selected Presentations}
+\begin{itemize}
+  \item Presented first-author paper, MICCAI, Daejeon, South Korea, 2025.
+  \item Oral presentation, ICMLA, Nassau, The Bahamas, 2022.
+\end{itemize}
+
+%========================= RESEARCH EXPERIENCE =========================
+\section{Research Experience}
+\dated{Graduate Research Assistant --- The University of Texas at Arlington}{Aug 2023 -- Present}
+\textit{Advisor: Dr.\ Dajiang Zhu}
+\begin{itemize}
+  \item Developed graph neural network methods for multi-class dementia classification and
+        continuous disease-progression modeling using multi-cohort neuroimaging data
+        (ADNI, NACC, and in-house LBD datasets).
+  \item Authored first-author papers at MICCAI 2025 and AAIC 2025, and co-authored
+        work across MICCAI, ISBI, and other venues.
+  \item Preprocessed and analyzed multimodal neuroimaging (T1-weighted, diffusion, and
+        functional MRI) using FreeSurfer, FSL, SPM12, and CAT12.
+  \item Contributed to drafting sections of federal research proposals.
+\end{itemize}
+\vspace{4pt}
+\dated{Research Assistant --- University of Nevada, Las Vegas}{Mar 2023 -- May 2023}
+\textit{Advisor: Dr.\ Junggab Son}
+\begin{itemize}
+  \item Researched interpretability methods for deep learning and generative models.
+\end{itemize}
+\vspace{4pt}
+\dated{Graduate Research Assistant --- Kennesaw State University}{Jan 2021 -- Dec 2022}
+\textit{Advisors: Dr.\ Junggab Son; Dr.\ Jiho Noh}
+\begin{itemize}
+  \item Researched computer vision, natural language processing, generative models, and
+        security of deep learning algorithms; published at ICMLA 2022.
+\end{itemize}
+
+%========================= TECHNICAL SKILLS =========================
+\section{Technical Skills}
+\textbf{Programming:} Python, MATLAB, \LaTeX \\
+\textbf{ML / DL Frameworks:} PyTorch, PyTorch Geometric, scikit-learn \\
+\textbf{Neuroimaging Tools:} FreeSurfer, FSL, SPM12, CAT12 \\
+\textbf{Methods:} Graph Neural Networks, Transformers, CNNs, Representation Learning, Domain Adaptation
+
+%========================= ACADEMIC SERVICE =========================
+\section{Academic Service}
+\begin{itemize}
+  \item Program Committee Reviewer, Intl.\ Conf.\ on PErvasive Technologies Related to
+        Assistive Environments (PETRA), 2026.
+\end{itemize}
+
+%========================= REFERENCES =========================
+\section{References}
+\begin{itemize}
+  \item Dr.\ Dajiang Zhu (Ph.D.\ advisor), Dept.\ of Computer Science \& Engineering,
+        University of Texas at Arlington.
+  \item Dr.\ Tianming Liu, School of Computing, University of Georgia.
+  \item Dr.\ Li Su, University of Cambridge / University of Sheffield;
+        Dr.\ John T.\ O'Brien, Dept.\ of Psychiatry, University of Cambridge.
+\end{itemize}
+\vspace{4pt}
+\textit{Full contact details available upon request.}
+
+\end{document}

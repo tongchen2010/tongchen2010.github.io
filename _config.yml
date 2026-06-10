@@ -218,6 +218,7 @@ include: ["_pages"]
 exclude:
   - al-folio-upgrade-report.md
   - bin/
+  - cv_src/
   - CONTRIBUTING.md
   - CUSTOMIZE.md
   - Dockerfile
