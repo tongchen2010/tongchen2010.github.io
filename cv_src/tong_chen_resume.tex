@@ -1,0 +1,95 @@
+%=========================================================================
+%  Tong Chen — One-page résumé (condensed from tong_chen_cv.tex)
+%  Compiles with pdfLaTeX. Keep to a single page.
+%=========================================================================
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+% --- Section styling: small-caps heading with a rule underneath ---
+\titleformat{\section}{\large\bfseries\scshape}{}{0em}{}[\vspace{-4pt}\titlerule]
+\titlespacing{\section}{0pt}{8pt}{4pt}
+
+% --- List defaults ---
+\setlist[itemize]{leftmargin=1.4em, itemsep=1pt, topsep=1pt, parsep=0pt}
+\setlist[enumerate]{leftmargin=1.6em, itemsep=1pt, topsep=1pt, parsep=0pt}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+% --- Helper: bold left, right-aligned date ---
+\newcommand{\dated}[2]{\textbf{#1}\hfill #2\par}
+
+\begin{document}
+
+%========================= HEADER =========================
+\begin{center}
+  {\LARGE\textbf{Tong Chen}}\\[4pt]
+  470-641-4428 \,$\cdot$\, \href{mailto:txc5603@mavs.uta.edu}{txc5603@mavs.uta.edu}\\[2pt]
+  \href{https://tongchen2010.github.io}{tongchen2010.github.io} \,$\cdot$\,
+  \href{https://github.com/tongchen2010}{github.com/tongchen2010} \,$\cdot$\,
+  \href{https://www.linkedin.com/in/tong-chen-850935124}{linkedin.com/in/tong-chen-850935124}
+\end{center}
+
+%========================= RESEARCH INTERESTS =========================
+\section{Research Interests}
+Machine learning and AI for medical imaging, with a focus on Alzheimer's disease (AD) and
+Lewy body dementia (LBD): self-supervised representation learning for longitudinal brain MRI
+and disease-progression modeling across the cognitive impairment continuum.
+
+%========================= EDUCATION =========================
+\section{Education}
+\dated{Ph.D. in Computer Science, The University of Texas at Arlington}{Aug 2023 -- Present}
+\textit{Advisor: Dr. Dajiang Zhu \quad (expected Dec 2026)}\par
+\vspace{2pt}
+\dated{M.S. in Computer Science, Kennesaw State University}{Jan 2021 -- Dec 2022}
+\vspace{2pt}
+\dated{B.S. in Computer Science, Kennesaw State University}{Aug 2012 -- May 2018}
+
+%========================= SELECTED PUBLICATIONS =========================
+\section{Selected Publications}
+{\small (\textbf{Bold} = author; * = equal contribution. Full list at
+\href{https://tongchen2010.github.io/publications/}{tongchen2010.github.io}.)}
+\begin{enumerate}
+  \item Minheng Chen, \textbf{Tong Chen}, Yan Zhuang, et al. ``Community-Level Modeling of
+        Gyral Folding Patterns for Robust and Anatomically Informed Individualized Brain
+        Mapping.'' \textit{NeuroImage}, 2026.
+  \item \textbf{Tong Chen}, Minheng Chen, Jing Zhang, et al. ``HiLoGraph: Hierarchical-
+        Longitudinal Brain Network Representation Learning.'' \textit{MICCAI}, 2026.
+        \textbf{(Early accept, top 9\%)}
+  \item \textbf{Tong Chen}, Minheng Chen, Jing Zhang, et al. ``A Unified Continuous Staging
+        Framework for Alzheimer's Disease and Lewy Body Dementia via Hierarchical Anatomical
+        Features.'' \textit{MICCAI}, 2025. \textbf{(Early accept, top 9\%)}
+  \item Chao Cao*, \textbf{Tong Chen}*, Nan Zhao*, et al. ``Gyral-Sulcal-Net: An Integrated
+        Network Representation of Brain Folding Patterns.'' \textit{IEEE ISBI}, 2026.
+        \textbf{(Co-first author)}
+\end{enumerate}
+
+%========================= RESEARCH EXPERIENCE =========================
+\section{Research Experience}
+\dated{Graduate Research Assistant, UT Arlington (Advisor: Dr. Dajiang Zhu)}{Aug 2023 -- Present}
+\begin{itemize}
+  \item Developed graph neural network methods for multi-class dementia classification and
+        continuous disease-progression modeling on large multi-cohort neuroimaging data.
+  \item Built sMRI and DTI preprocessing and analysis pipelines for multi-cohort studies;
+        first-author work at MICCAI and AAIC and a co-authored \textit{NeuroImage} article.
+\end{itemize}
+\vspace{2pt}
+\dated{Research Assistant, UNC Chapel Hill (Advisor: Dr. Gang Li)}{May 2025 -- Aug 2025}
+\begin{itemize}
+  \item Developed cortical surface-based machine learning methods on Human Connectome
+        Project (HCP) data.
+\end{itemize}
+
+%========================= TECHNICAL SKILLS =========================
+\section{Technical Skills}
+\textbf{Programming:} Python, MATLAB \quad \textbf{Frameworks:} PyTorch, PyTorch Geometric, scikit-learn \\
+\textbf{Models:} Graph Neural Networks, Transformers, State-Space Models (Mamba), Multimodal LLMs \\
+\textbf{Neuroimaging:} FreeSurfer, FSL, SPM12, CAT12, Connectome Workbench, DSI Studio, MRtrix3 \\
+\textbf{Datasets:} ADNI, NACC, AABC, HCP, BCP, in-house LBD cohorts
+
+\end{document}
