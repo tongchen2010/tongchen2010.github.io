@@ -1,0 +1,50 @@
+%=========================================================================
+%  Tong Chen — CV variant for clinical / non-computational audiences
+%  (neurology, radiology, medical-school committees). Reuses the SAME
+%  shared partials; the Research Interests are de-jargoned and a short
+%  note clarifies the standing of CS/imaging conferences. pdfLaTeX.
+%=========================================================================
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.9in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\titleformat{\section}{\large\bfseries\scshape}{}{0em}{}[\vspace{-4pt}\titlerule]
+\titlespacing{\section}{0pt}{12pt}{6pt}
+
+\setlist[itemize]{leftmargin=1.4em, itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate]{leftmargin=1.8em, itemsep=2pt, topsep=2pt, parsep=0pt}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\newcommand{\dated}[2]{\textbf{#1}\hfill #2\par}
+
+\begin{document}
+
+\input{_header}
+
+%========================= RESEARCH INTERESTS (clinical-leaning) =========================
+\section{Research Interests}
+Artificial intelligence for brain imaging in neurodegenerative disease, with a focus on
+Alzheimer's disease and Lewy body dementia across the cognitive impairment continuum.
+My work builds computational tools that characterize disease progression and support
+diagnosis from MRI across large, multi-site patient and aging cohorts.
+
+\input{_education}
+\input{_experience}
+% Brief note for readers outside computer science.
+{\small\textit{Note: In computer science and medical imaging, peer-reviewed conferences such
+as MICCAI and IEEE ISBI are archival, full-paper publications of record (comparable in
+selectivity and citation impact to journals in many clinical fields).}}\par
+\vspace{4pt}
+\input{_publications}
+\input{_presentations}
+\input{_honors}
+\input{_skills}
+\input{_service}
+
+\end{document}

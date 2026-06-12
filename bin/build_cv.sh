@@ -23,7 +23,13 @@ OUT_DIR="$REPO_ROOT/assets/pdf"
 IMAGE="cv-builder:latest"
 
 # Source tex files to compile (each <name>.tex -> assets/pdf/<name>.pdf).
-TEX_FILES=(tong_chen_cv.tex tong_chen_resume.tex)
+# Files beginning with "_" are shared \input partials and are NOT compiled directly.
+TEX_FILES=(
+  tong_chen_cv.tex            # master (medical-imaging audience)
+  tong_chen_cv_cs.tex         # CS / AI / ML audience
+  tong_chen_cv_clinical.tex   # clinical / non-computational audience
+  tong_chen_resume.tex        # one-page resume
+)
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "error: docker is required but not found on PATH." >&2
