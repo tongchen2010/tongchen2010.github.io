@@ -19,19 +19,23 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 SRC_DIR="$REPO_ROOT/cv_src"
-TEX_FILE="tong_chen_cv.tex"
-OUT_PDF="$REPO_ROOT/assets/pdf/tong_chen_cv.pdf"
+OUT_DIR="$REPO_ROOT/assets/pdf"
 IMAGE="cv-builder:latest"
+
+# Source tex files to compile (each <name>.tex -> assets/pdf/<name>.pdf).
+TEX_FILES=(tong_chen_cv.tex tong_chen_resume.tex)
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "error: docker is required but not found on PATH." >&2
   exit 1
 fi
 
-if [[ ! -f "$SRC_DIR/$TEX_FILE" ]]; then
-  echo "error: $SRC_DIR/$TEX_FILE not found." >&2
-  exit 1
-fi
+for TEX_FILE in "${TEX_FILES[@]}"; do
+  if [[ ! -f "$SRC_DIR/$TEX_FILE" ]]; then
+    echo "error: $SRC_DIR/$TEX_FILE not found." >&2
+    exit 1
+  fi
+done
 
 # Build the LaTeX image once (medium TeX Live + the two extra packages the CV uses).
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
@@ -42,18 +46,22 @@ RUN tlmgr install titlesec enumitem && mktexlsr
 DOCKERFILE
 fi
 
-echo "==> Compiling $TEX_FILE..."
-# Run as the host user (-e HOME=/tmp keeps pdflatex happy) so the PDF and any
-# aux files are owned by you, not root.
-docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
-  -v "$SRC_DIR":/work -w /work "$IMAGE" bash -c "
-  pdflatex -interaction=nonstopmode -halt-on-error $TEX_FILE >/dev/null 2>&1
-  pdflatex -interaction=nonstopmode -halt-on-error $TEX_FILE
-"
+for TEX_FILE in "${TEX_FILES[@]}"; do
+  echo "==> Compiling $TEX_FILE..."
+  # Run as the host user (-e HOME=/tmp keeps pdflatex happy) so the PDF and any
+  # aux files are owned by you, not root.
+  docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+    -v "$SRC_DIR":/work -w /work "$IMAGE" bash -c "
+    pdflatex -interaction=nonstopmode -halt-on-error $TEX_FILE >/dev/null 2>&1
+    pdflatex -interaction=nonstopmode -halt-on-error $TEX_FILE
+  "
+  # Move the freshly built PDF into the site.
+  mv "$SRC_DIR/${TEX_FILE%.tex}.pdf" "$OUT_DIR/${TEX_FILE%.tex}.pdf"
+  echo "    Updated $OUT_DIR/${TEX_FILE%.tex}.pdf"
+done
 
-# Move the freshly built PDF into the site and clean up LaTeX aux files.
-mv "$SRC_DIR/tong_chen_cv.pdf" "$OUT_PDF"
+# Clean up LaTeX aux files.
 rm -f "$SRC_DIR"/*.aux "$SRC_DIR"/*.log "$SRC_DIR"/*.out
 
-echo "==> Done. Updated $OUT_PDF"
+echo "==> Done."
 echo "    Next: git add -A && git commit -m 'Update CV' && git push"
