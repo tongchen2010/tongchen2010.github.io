@@ -1,7 +1,9 @@
 %=========================================================================
-%  Tong Chen — Academic CV
-%  Compiles with pdfLaTeX (works directly on Overleaf).
-%  TODO markers (%% <-- ) flag the spots you should fill in / verify.
+%  Tong Chen — Academic CV (MASTER / medical-imaging audience)
+%  Shared sections live in _*.tex partials and are \input here.
+%  Variants (tong_chen_cv_cs.tex, tong_chen_cv_clinical.tex) reuse the
+%  SAME partials and only change the Research Interests + section order.
+%  Edit a partial once -> every CV updates. Compiles with pdfLaTeX.
 %=========================================================================
 \documentclass[11pt]{article}
 
@@ -27,14 +29,7 @@
 
 \begin{document}
 
-%========================= HEADER =========================
-\begin{center}
-  {\LARGE\textbf{Tong Chen}}\\[5pt]
-  470-641-4428 \,$\cdot$\, \href{mailto:txc5603@mavs.uta.edu}{txc5603@mavs.uta.edu}\\[2pt]
-  \href{https://tongchen2010.github.io}{tongchen2010.github.io} \,$\cdot$\,
-  \href{https://github.com/tongchen2010}{github.com/tongchen2010} \,$\cdot$\,
-  \href{https://www.linkedin.com/in/tong-chen-850935124}{linkedin.com/in/tong-chen-850935124}
-\end{center}
+\input{_header}
 
 %========================= RESEARCH INTERESTS =========================
 \section{Research Interests}
@@ -43,189 +38,12 @@ Lewy body dementia (LBD). My research develops self-supervised representation le
 methods for longitudinal brain MRI, models disease progression across the cognitive
 impairment continuum, and builds interpretable models for multi-cohort neuroimaging analysis.
 
-%========================= EDUCATION =========================
-\section{Education}
-\dated{Ph.D. in Computer Science}{Aug 2023 -- Present (expected Dec 2026)}
-The University of Texas at Arlington \hfill \textit{Advisor: Dr. Dajiang Zhu}\par
-\vspace{4pt}
-\dated{M.S. in Computer Science}{Jan 2021 -- Dec 2022}
-Kennesaw State University \hfill \textit{Advisors: Dr. Junggab Son; Dr. Jiho Noh}\par
-\vspace{4pt}
-\dated{B.S. in Computer Science}{Aug 2012 -- May 2018}
-Kennesaw State University\par
-
-%========================= RESEARCH EXPERIENCE =========================
-\section{Research Experience}
-\dated{Graduate Research Assistant --- The University of Texas at Arlington}{Aug 2023 -- Present}
-\textit{Advisor: Dr.\ Dajiang Zhu}
-\begin{itemize}
-  \item Developed graph neural network methods for multi-class dementia classification and
-        continuous disease-progression modeling using large multi-cohort neuroimaging data.
-  \item Built sMRI and DTI preprocessing and analysis pipelines for multi-cohort
-        neuroimaging studies.
-  \item Published first-author work at MICCAI and AAIC and a co-authored \textit{NeuroImage}
-        article, plus co-authored papers across MICCAI, ISBI, and related venues.
-  \item Assisted in preparing NIH grant proposals.
-\end{itemize}
-\vspace{4pt}
-\dated{Research Assistant --- University of North Carolina at Chapel Hill}{May 2025 -- Aug 2025}
-\textit{Advisor: Dr.\ Gang Li}
-\begin{itemize}
-  \item Developed cortical surface-based machine learning methods for brain MRI analysis
-        using Human Connectome Project (HCP) data.
-\end{itemize}
-\vspace{4pt}
-\dated{Research Assistant --- University of Nevada, Las Vegas}{Mar 2023 -- May 2023}
-\textit{Advisor: Dr.\ Junggab Son}
-\begin{itemize}
-  \item Researched interpretability methods for deep learning and generative models.
-\end{itemize}
-\vspace{4pt}
-\dated{Graduate Research Assistant --- Kennesaw State University}{Jan 2021 -- Dec 2022}
-\textit{Advisors: Dr.\ Junggab Son; Dr.\ Jiho Noh}
-\begin{itemize}
-  \item Researched computer vision, natural language processing, generative models, and
-        security of deep learning algorithms; published at ICMLA 2022.
-\end{itemize}
-
-%========================= PUBLICATIONS =========================
-\section{Publications}
-{\small (* = equal contribution.)}
-
-\subsection*{Conference Publications}
-\begin{enumerate}
-  \item \textbf{Tong Chen}, Minheng Chen, Jing Zhang, Chao Cao, Li Su, Tianming Liu, and
-        Dajiang Zhu. ``HiLoGraph: Hierarchical-Longitudinal Brain Network Representation
-        Learning.'' \textit{Intl.\ Conf.\ on Medical Image Computing and Computer Assisted
-        Intervention (MICCAI)}, 2026. \textbf{(Early accept, top 9\%)}
-  \item \textbf{Tong Chen}, Minheng Chen, Jing Zhang, Yan Zhuang, Chao Cao, Xiaowei Yu,
-        Yanjun Lyu, Lu Zhang, Li Su, Tianming Liu, and Dajiang Zhu. ``A Unified Continuous
-        Staging Framework for Alzheimer's Disease and Lewy Body Dementia via Hierarchical
-        Anatomical Features.'' \textit{Intl.\ Conf.\ on Medical Image Computing and Computer
-        Assisted Intervention (MICCAI)}, Daejeon, South Korea, 2025. \textbf{(Early accept, top 9\%)}
-  \item Chao Cao*, \textbf{Tong Chen}*, Nan Zhao*, Minheng Chen, Minghao Qu, Zhiyuan Zhang,
-        Xin Shi, Xiang Li, Tianming Liu, and Dajiang Zhu. ``Gyral-Sulcal-Net: An Integrated
-        Network Representation of Brain Folding Patterns.'' \textit{IEEE Intl.\ Symposium on
-        Biomedical Imaging (ISBI)}, 2026. \textbf{(Co-first author)}
-  \item Minheng Chen, \textbf{Tong Chen}, Chao Cao, Jing Zhang, Li Su, Tianming Liu, and
-        Dajiang Zhu. ``Folding-Fiducial Geodesic Representation for Morphometric Similarity
-        Networks in Neurodegenerative Disease Characterization.'' \textit{IEEE Intl.\
-        Symposium on Biomedical Imaging (ISBI)}, 2026.
-  \item Jing Zhang, Yanjun Lyu, Chao Cao, Minheng Chen, \textbf{Tong Chen}, Li Su,
-        Tianming Liu, and Dajiang Zhu. ``Integrating Population and Individual Brain Network
-        with Mixture-of-Experts for Mild Cognitive Impairment Study.'' \textit{IEEE Intl.\
-        Symposium on Biomedical Imaging (ISBI)}, 2026.
-  \item Minheng Chen, Xiaowei Yu, Jing Zhang, \textbf{Tong Chen}, Chao Cao, Yan Zhuang,
-        Yanjun Lyu, Lu Zhang, Tianming Liu, and Dajiang Zhu. ``Core-Periphery Principle
-        Guided State Space Model for Functional Connectome Classification.'' \textit{Intl.\
-        Conf.\ on Medical Image Computing and Computer Assisted Intervention (MICCAI)}, 2025.
-  \item Xiaowei Yu, Jing Zhang, \textbf{Tong Chen}, Yan Zhuang, Minheng Chen, Chao Cao,
-        Yanjun Lyu, Lu Zhang, Li Su, Tianming Liu, and Dajiang Zhu. ``Domain-Adaptive
-        Diagnosis of Lewy Body Disease with Transferability Aware Transformer.''
-        \textit{Intl.\ Conf.\ on Medical Image Computing and Computer Assisted Intervention
-        (MICCAI)}, 2025.
-  \item Yan Zhuang, Minheng Chen, Chao Cao, \textbf{Tong Chen}, Jing Zhang, Xiaowei Yu,
-        Yanjun Lyu, Lu Zhang, Tianming Liu, and Dajiang Zhu. ``GyralNet Subnetwork
-        Partitioning via Differentiable Spectral Modularity Optimization.'' \textit{Intl.\
-        Workshop on Machine Learning in Medical Imaging (MLMI)}, pp.\ 477--486, 2025.
-  \item Jing Zhang, Xiaowei Yu, Minheng Chen, Lu Zhang, \textbf{Tong Chen}, Yan Zhuang,
-        Chao Cao, Yanjun Lyu, Li Su, Tianming Liu, and Dajiang Zhu. ``Bridging Brain
-        Connectomes and Clinical Reports for Early Alzheimer's Disease Diagnosis.''
-        \textit{Intl.\ Workshop on Machine Learning in Medical Imaging (MLMI)},
-        pp.\ 604--614, 2025.
-  \item Jing Zhang, Xiaowei Yu, \textbf{Tong Chen}, Chao Cao, Minheng Chen, Yan Zhuang,
-        Yanjun Lyu, Lu Zhang, Li Su, Tianming Liu, and Dajiang Zhu. ``BrainNet-MoE:
-        Brain-Inspired Mixture-of-Experts Learning for Neurological Disease Identification.''
-        \textit{IEEE Intl.\ Conf.\ on Data Mining Workshops (ICDMW)}, pp.\ 1995--2001, 2025.
-  \item Jing Zhang, Yanjun Lyu, Xiaowei Yu, Lu Zhang, Chao Cao, \textbf{Tong Chen},
-        Minheng Chen, Yan Zhuang, Tianming Liu, and Dajiang Zhu. ``Classification of Mild
-        Cognitive Impairment Based on Dynamic Functional Connectivity Using Spatio-Temporal
-        Transformer.'' \textit{IEEE Intl.\ Symposium on Biomedical Imaging (ISBI)}, 2025.
-  \item Jing Zhang, Xiaowei Yu, Yanjun Lyu, Lu Zhang, \textbf{Tong Chen}, Chao Cao,
-        Yan Zhuang, Minheng Chen, Tianming Liu, and Dajiang Zhu. ``Brain-Adapter: Enhancing
-        Neurological Disorder Analysis with Adapter-Tuning Multimodal Large Language
-        Models.'' \textit{IEEE Intl.\ Symposium on Biomedical Imaging (ISBI)}, 2025.
-  \item Minheng Chen, Chao Cao, \textbf{Tong Chen}, Yan Zhuang, Jing Zhang, Yanjun Lyu,
-        Xiaowei Yu, Lu Zhang, Tianming Liu, and Dajiang Zhu. ``Using Structural Similarity
-        and Kolmogorov-Arnold Networks for Anatomical Embedding of Cortical Folding
-        Patterns.'' \textit{IEEE Intl.\ Symposium on Biomedical Imaging (ISBI)}, 2025.
-  \item Yanjun Lyu, Jing Zhang, Lu Zhang, \textbf{Tong Chen}, Xiaowei Yu, Minheng Chen,
-        Yan Zhuang, Chao Cao, Tianming Liu, and Dajiang Zhu. ``CA-VQVAE: Cortical Folding
-        Aware Numerical Representation of White-Matter Structure.'' \textit{IEEE Intl.\
-        Symposium on Biomedical Imaging (ISBI)}, 2025.
-  \item Xiaowei Yu, Lu Zhang, Chao Cao, \textbf{Tong Chen}, Yanjun Lyu, Jing Zhang,
-        Tianming Liu, and Dajiang Zhu. ``Gyri vs.\ Sulci: Core-Periphery Organization in
-        Functional Brain Networks.'' \textit{Intl.\ Conf.\ on Medical Image Computing and
-        Computer Assisted Intervention (MICCAI)}, 2024.
-  \item Chao Cao, Xiaowei Yu, Lu Zhang, \textbf{Tong Chen}, Yanjun Lyu, Tianming Liu, and
-        Dajiang Zhu. ``Enhancing Group-Wise Consistency in 3-Hinge Gyrus Matching via
-        Anatomical Embedding and Structural Connectivity Optimization.'' \textit{IEEE Intl.\
-        Symposium on Biomedical Imaging (ISBI)}, Athens, Greece, 2024.
-  \item \textbf{Tong Chen}, Jiho Noh, Luke Cranfill, John Morris, and Junggab Son.
-        ``Improving Fashion Attribute Classification Accuracy with Limited Labeled Data
-        Using Transfer Learning.'' \textit{21st IEEE Intl.\ Conf.\ on Machine Learning and
-        Applications (ICMLA)}, Nassau, The Bahamas, 2022. \textbf{(Oral presentation,
-        acceptance rate 32.4\%)}
-\end{enumerate}
-
-\subsection*{Journal Articles}
-\begin{enumerate}
-  \item Minheng Chen, \textbf{Tong Chen}, Yan Zhuang, Chao Cao, Jing Zhang, Tianming Liu,
-        Lu Zhang, and Dajiang Zhu. ``Community-Level Modeling of Gyral Folding Patterns for
-        Robust and Anatomically Informed Individualized Brain Mapping.'' \textit{NeuroImage},
-        122037, 2026.
-  \item Lu Zhang, Junqi Qu, Haotian Ma, \textbf{Tong Chen}, Tianming Liu, and Dajiang Zhu.
-        ``Exploring Alzheimer's Disease: A Comprehensive Brain Connectome-Based Survey.''
-        \textit{Psychoradiology}, kkad033, 2024.
-\end{enumerate}
-
-\subsection*{Conference Abstracts}
-\begin{enumerate}
-  \item \textbf{Tong Chen}, Minheng Chen, Yan Zhuang, Jing Zhang, Lu Zhang, Tianming Liu,
-        Andrew M. Blamire, John-Paul Taylor, Li Su, John T. O'Brien, and Dajiang Zhu.
-        ``Representing the Cognitive Impairment Continuum of Alzheimer's Disease and Lewy
-        Body Dementia with a Novel Finer-Scale Cortical Representation via Disease
-        Embedding Tree.'' Alzheimer's Association International Conference (AAIC); abstract
-        published in \textit{Alzheimer's \& Dementia}, 21, e102179, 2025.
-  \item Yanjun Lyu, Xiaowei Yu, Minghao Qu, \textbf{Tong Chen}, Nan Zhao, Xiang Li, and
-        Lu Zhang. ``Gyral-Sulcal Net: A Novel Brain Network Representation for Mild
-        Cognitive Impairment Classification.'' Alzheimer's Association International
-        Conference (AAIC); abstract published in \textit{Alzheimer's \& Dementia}, 21,
-        e102417, 2025.
-\end{enumerate}
-
-%========================= PRESENTATIONS =========================
-\section{Presentations}
-\begin{itemize}
-  \item ``A Unified Continuous Staging Framework for Alzheimer's Disease and Lewy Body
-        Dementia via Hierarchical Anatomical Features.'' Poster, MICCAI 2025, Daejeon,
-        South Korea.
-  \item ``Improving Fashion Attribute Classification Accuracy with Limited Labeled Data
-        Using Transfer Learning.'' Oral presentation, ICMLA 2022, Nassau, The Bahamas.
-\end{itemize}
-
-%========================= HONORS & AWARDS =========================
-\section{Honors \& Awards}
-\begin{itemize}
-  \item John Stephen Schuchman Memorial Outstanding PhD Student Scholarship Award,
-        Dept.\ of Computer Science \& Engineering, UT Arlington, 2026
-\end{itemize}
-
-%========================= TECHNICAL SKILLS =========================
-\section{Technical Skills}
-\textbf{Programming:} Python, MATLAB, \LaTeX \\
-\textbf{ML / DL Frameworks:} PyTorch, PyTorch Geometric, scikit-learn \\
-\textbf{Neuroimaging Tools:} FreeSurfer, FSL, SPM12, CAT12, Connectome Workbench,
-DSI Studio, MRtrix3, medInria \\
-\textbf{Models:} Graph Neural Networks, Transformers, CNNs, State-Space Models (Mamba),
-Multimodal LLMs \\
-\textbf{Datasets:} ADNI, NACC, AABC, HCP, BCP, in-house LBD cohorts
-
-%========================= ACADEMIC SERVICE =========================
-\section{Academic Service}
-\begin{itemize}
-  \item Program Committee Reviewer, Intl.\ Conf.\ on PErvasive Technologies Related to
-        Assistive Environments (PETRA), 2026.
-\end{itemize}
+\input{_education}
+\input{_experience}
+\input{_publications}
+\input{_presentations}
+\input{_honors}
+\input{_skills}
+\input{_service}
 
 \end{document}

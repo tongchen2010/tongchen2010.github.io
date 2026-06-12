@@ -1,0 +1,46 @@
+%=========================================================================
+%  Tong Chen — CV variant for CS / AI / ML audiences
+%  (CS faculty, industry research scientist). Reuses the SAME shared
+%  partials as the master; only the Research Interests wording and the
+%  position of Technical Skills differ. Compiles with pdfLaTeX.
+%=========================================================================
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.9in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\titleformat{\section}{\large\bfseries\scshape}{}{0em}{}[\vspace{-4pt}\titlerule]
+\titlespacing{\section}{0pt}{12pt}{6pt}
+
+\setlist[itemize]{leftmargin=1.4em, itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate]{leftmargin=1.8em, itemsep=2pt, topsep=2pt, parsep=0pt}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\newcommand{\dated}[2]{\textbf{#1}\hfill #2\par}
+
+\begin{document}
+
+\input{_header}
+
+%========================= RESEARCH INTERESTS (CS-leaning) =========================
+\section{Research Interests}
+Machine learning for structured and graph-based data, with an emphasis on self-supervised
+representation learning, graph neural networks, and state-space and transformer models.
+I apply these methods to longitudinal medical imaging and disease-progression modeling,
+spanning Alzheimer's disease and Lewy body dementia.
+
+\input{_education}
+% Technical Skills promoted near the top for CS/AI readers.
+\input{_skills}
+\input{_experience}
+\input{_publications}
+\input{_presentations}
+\input{_honors}
+\input{_service}
+
+\end{document}
