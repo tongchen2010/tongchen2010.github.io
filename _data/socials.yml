@@ -2,7 +2,6 @@
 # the socials will be displayed in the order they are defined here
 # for more information, please refer to the documentation of jekyll-socials plugin: https://github.com/george-gca/jekyll-socials
 email: txc5603@mavs.uta.edu # your email address
-cv_pdf: /assets/pdf/tong_chen_cv.pdf # path to your CV PDF file
 github_username: tongchen2010 # your GitHub user name
 scholar_userid: rOHUnVkAAAAJ # your Google Scholar ID
 linkedin_username: tong-chen-850935124 # your LinkedIn user name (update if you customize the URL)
