@@ -51,6 +51,14 @@ A few interactive AI/ML demos that run **entirely in your browser** — no insta
     </div>
   </a>
 
+  <a href="/assets/demos/attention-heatmap.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
+    <img src="/assets/demos/attention-heatmap.png" alt="Attention Heatmap" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
+    <div style="padding:0.6rem 0.85rem;">
+      <strong>Attention Heatmap</strong>
+      <div style="font-size:0.82em;opacity:0.72;margin-top:0.25rem;line-height:1.45;">See what a Transformer looks at — a real BERT's self-attention across every layer and head, live in your browser.</div>
+    </div>
+  </a>
+
   <a href="/assets/demos/semantic-search-rag.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
     <img src="/assets/demos/semantic-search-rag.png" alt="Semantic Search" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
     <div style="padding:0.6rem 0.85rem;">

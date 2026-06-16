@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attention Heatmap — see what a Transformer looks at</title>
+  <meta name="description" content="Type any sentence and watch a real Transformer (BERT) reveal its self-attention — which words each word looks at — across all 6 layers and 12 heads, entirely in your browser." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='2' width='13' height='13' rx='2' fill='%236ea8fe'/><rect x='17' y='2' width='13' height='13' rx='2' fill='%238b7cff' opacity='.55'/><rect x='2' y='17' width='13' height='13' rx='2' fill='%238b7cff' opacity='.35'/><rect x='17' y='17' width='13' height='13' rx='2' fill='%236ea8fe'/></svg>" />
+  <style>
+:root {
+  --bg: #0b0f17; --panel: #131927; --panel-2: #1b2336; --border: #273149;
+  --text: #e7ecf5; --muted: #93a0b8; --accent: #6ea8fe; --accent-2: #8b7cff;
+  --radius: 14px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; min-height: 100%;
+  background: radial-gradient(1200px 600px at 80% -10%, #1a2236 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 880px; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.brand { display: flex; gap: 14px; align-items: center; }
+.logo { font-size: 30px; line-height: 1;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
+.tagline { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+.ghlink { color: var(--muted); text-decoration: none; border: 1px solid var(--border);
+  padding: 7px 12px; border-radius: 10px; font-size: 0.85rem; white-space: nowrap; font-family: var(--mono); }
+.ghlink:hover { color: var(--text); border-color: var(--accent); }
+
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.input-row { display: flex; gap: 10px; }
+input[type="text"] { flex: 1; min-width: 0; background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 1rem; }
+input[type="text"]:focus { outline: none; border-color: var(--accent); }
+button.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #0b0f17;
+  border: none; border-radius: 10px; padding: 11px 20px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 999px; padding: 7px 13px; font-size: 0.82rem; cursor: pointer; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip:hover:not(:disabled) { border-color: var(--accent); }
+.chip:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.progress-wrap { margin-top: 14px; }
+.progress-bar { height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.25s ease; }
+.status { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); margin: 8px 0 0; }
+.status.err { color: #f85149; }
+
+/* controls */
+.controls { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+.ctrl-row { display: flex; align-items: center; gap: 12px; }
+.ctrl-label { width: 52px; color: var(--muted); font-size: 0.82rem; flex: none; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg-btn { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 11px; font-size: 0.82rem; cursor: pointer; font-family: var(--mono); min-width: 34px; }
+.seg-btn:hover { color: var(--text); border-color: var(--accent); }
+.seg-btn.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #0b0f17; border-color: transparent; font-weight: 700; }
+
+/* viz */
+.viz { display: flex; flex-direction: column; gap: 12px; }
+.guide { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+.guide b { color: var(--text); font-weight: 600; }
+.note { margin: -4px 0 0; color: #d8a657; font-size: 0.78rem; font-family: var(--mono); }
+
+.matrix-wrap { overflow: auto; padding: 4px 2px 6px; }
+.heatmap { display: grid; gap: 2px; --rowlab: 92px; --cell: 24px; width: max-content; }
+.corner { font-size: 9px; color: var(--muted); display: flex; align-items: flex-end; justify-content: flex-end;
+  padding-right: 4px; font-family: var(--mono); }
+.clab { height: 78px; position: relative; }
+.clab span { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  writing-mode: vertical-rl; transform: translateX(-50%) rotate(180deg);
+  font-size: 11px; color: var(--muted); white-space: nowrap; max-height: 74px; overflow: hidden; font-family: var(--mono); }
+.clab.special span { color: var(--accent); }
+.rlab { width: var(--rowlab); padding-right: 7px; text-align: right; font-size: 11px; color: var(--muted);
+  display: flex; align-items: center; justify-content: flex-end; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; font-family: var(--mono); cursor: default; }
+.rlab.special { color: var(--accent); }
+.clab:hover span, .rlab:hover { color: var(--text); }
+.cell { width: var(--cell); height: var(--cell); border-radius: 3px; background: var(--panel-2); cursor: crosshair;
+  transition: opacity 0.08s; }
+.heatmap.dim .cell { opacity: 0.18; }
+.heatmap.dim .cell.hl { opacity: 1; outline: 1px solid rgba(231,236,245,0.4); }
+
+/* connections (arcs) */
+.arcs-wrap { padding: 4px 0; }
+#arcs { width: 100%; display: block; font-family: var(--mono); }
+#arcs .arc { stroke: var(--accent); fill: none; }
+#arcs.focus .arc { stroke-opacity: 0.04 !important; }
+#arcs.focus .arc.on { stroke-opacity: 0.95 !important; stroke: var(--accent-2); }
+#arcs text { font-size: 12px; fill: var(--muted); dominant-baseline: middle; cursor: default; }
+#arcs text.special { fill: var(--accent); }
+#arcs text.ltok:hover { fill: var(--text); font-weight: 700; }
+
+/* legend */
+.legend { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 0.78rem; flex-wrap: wrap; }
+.legend-bar { width: 130px; height: 9px; border-radius: 999px;
+  background: linear-gradient(90deg, rgba(110,168,254,0.10), var(--accent), var(--accent-2)); }
+.legend-note { margin-left: 4px; }
+
+/* tooltip */
+.tooltip { position: fixed; display: none; pointer-events: none; z-index: 20;
+  background: #05080f; border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px;
+  font-size: 0.8rem; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+.tooltip b { color: var(--accent); }
+.tooltip span { display: block; margin-top: 2px; color: var(--muted); font-family: var(--mono); }
+
+.pagefoot { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 2px 0 8px; }
+a { color: var(--accent); }
+@media (max-width: 560px) { .ghlink { display: none; } .ctrl-label { width: 44px; } }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">▦</span>
+        <div>
+          <h1>Attention Heatmap</h1>
+          <p class="tagline">Type a sentence. A real Transformer (<strong>BERT</strong>) runs <em>in your browser</em> and shows its <strong>self-attention</strong> — which words each word looks at — across all <strong>6 layers × 12 heads</strong>.</p>
+        </div>
+      </div>
+      <a class="ghlink" id="repo-link" href="#" target="_blank" rel="noopener">&lt;/&gt; Source</a>
+    </header>
+
+    <section class="panel">
+      <div class="input-row">
+        <input id="sentence" type="text" value="The cat sat on the mat because it was tired." placeholder="Type a sentence…" disabled />
+        <button id="viz-btn" class="primary" disabled>Visualize</button>
+      </div>
+      <div class="examples" id="examples">
+        <button class="chip" disabled>The trophy didn't fit in the suitcase because it was too big.</button>
+        <button class="chip" disabled>John gave Mary a book and she thanked him.</button>
+        <button class="chip" disabled>The river bank flooded after the heavy rain.</button>
+        <button class="chip" disabled>Paris is the capital of France.</button>
+      </div>
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <p class="status" id="status">Loading the Transformer (~91 MB, first time only)…</p>
+      </div>
+    </section>
+
+    <section class="panel controls" id="controls" hidden>
+      <div class="ctrl-row"><span class="ctrl-label">Layer</span><div class="seg" id="layers"></div></div>
+      <div class="ctrl-row"><span class="ctrl-label">Head</span><div class="seg" id="heads"></div></div>
+      <div class="ctrl-row"><span class="ctrl-label">View</span>
+        <div class="seg" id="views">
+          <button class="seg-btn active" data-view="matrix">Matrix</button>
+          <button class="seg-btn" data-view="arcs">Connections</button>
+        </div>
+      </div>
+    </section>
+
+    <main class="viz" id="viz" hidden>
+      <p class="guide" id="guide">Each <b>row</b> is a word doing the looking; brighter <b>cells</b> are the words it attends to. Hover a cell for the exact weight, or hover a token to isolate its row/column.</p>
+      <p class="note" id="note" hidden></p>
+      <div class="matrix-wrap" id="matrix-wrap"><div class="heatmap" id="heatmap"></div></div>
+      <div class="arcs-wrap" id="arcs-wrap" hidden><svg id="arcs" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div class="legend">
+        <span>low</span>
+        <div class="legend-bar"></div>
+        <span>high</span>
+        <span class="legend-note">attention weight (each row scaled to its own max)</span>
+      </div>
+    </main>
+
+    <footer class="pagefoot">
+      <span>Real self-attention read out from <a href="https://github.com/huggingface/transformers.js" target="_blank" rel="noopener">🤗 Transformers.js</a> (all-MiniLM-L6-v2, a BERT encoder). Model + inference run locally — nothing leaves your browser.</span>
+    </footer>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+  <script type="module">
+// Attention Heatmap — visualize a real Transformer's self-attention, in the browser.
+// A real BERT encoder (all-MiniLM-L6-v2, ONNX-exported *with attentions*) runs locally
+// via Transformers.js (WebAssembly). For any sentence we read out all 6 layers x 12 heads
+// of self-attention and render them as an interactive heatmap + a BertViz-style arc view.
+
+const REPO_URL = "https://github.com/tongchen2010/attention-heatmap";
+const LIB_URL = "https://esm.run/@huggingface/transformers";
+const MODEL = "bradynapier/all_miniLM_L6_v2_with_attentions_onnx";
+const N_LAYERS = 6, N_HEADS = 12, MAX_TOKENS = 48;
+
+const $ = (id) => document.getElementById(id);
+const sentenceEl = $("sentence"), vizBtn = $("viz-btn"),
+  statusEl = $("status"), fill = $("progress-fill"), progressWrap = $("progress-wrap"),
+  controls = $("controls"), layersEl = $("layers"), headsEl = $("heads"), viewsEl = $("views"),
+  vizEl = $("viz"), heatmap = $("heatmap"), matrixWrap = $("matrix-wrap"),
+  arcsWrap = $("arcs-wrap"), arcsSvg = $("arcs"), tooltip = $("tooltip"), noteEl = $("note");
+$("repo-link").href = REPO_URL;
+
+let T = null, tokenizer = null, model = null;
+let tokens = [], rawAtt = [], seq = 0, curM = null;
+let curLayer = 1, curHead = 3, curView = "matrix";   // L1/H3 shows clean token-to-token structure by default
+const matCache = new Map();
+
+init();
+
+async function init() {
+  buildSegs();
+  try { T = await import(LIB_URL); }
+  catch (e) { return fail("Couldn't load Transformers.js (are you online?)."); }
+  try {
+    statusEl.textContent = "Loading the tokenizer…";
+    tokenizer = await T.AutoTokenizer.from_pretrained(MODEL);
+    statusEl.textContent = "Downloading the model (~91 MB, first time only)…";
+    model = await T.AutoModel.from_pretrained(MODEL, {
+      dtype: "fp32",
+      progress_callback: (r) => {
+        if (r.status === "progress" && r.progress != null) {
+          fill.style.width = r.progress + "%";
+          statusEl.textContent = `Downloading ${r.file || "model"}… ${Math.round(r.progress)}%`;
+        }
+      },
+    });
+    fill.style.width = "100%";
+    ready();
+  } catch (e) { console.error(e); fail("Failed to load the model: " + (e?.message || e)); }
+}
+
+function ready() {
+  progressWrap.style.display = "none";
+  sentenceEl.disabled = false; vizBtn.disabled = false;
+  document.querySelectorAll(".chip").forEach((c) => {
+    c.disabled = false;
+    c.addEventListener("click", () => { sentenceEl.value = c.textContent; visualize(); });
+  });
+  vizBtn.addEventListener("click", visualize);
+  sentenceEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); visualize(); }
+  });
+  // tooltip via delegation (cells are recreated every render)
+  heatmap.addEventListener("mousemove", (e) => {
+    const c = e.target.closest(".cell");
+    if (!c || !curM) return hideTip();
+    const q = +c.dataset.q, k = +c.dataset.k;
+    showTip(e, q, k, curM[q][k]);
+  });
+  heatmap.addEventListener("mouseleave", hideTip);
+  sentenceEl.focus();
+  visualize();   // render the default sentence right away
+}
+
+/* ---------- controls ---------- */
+function buildSegs() {
+  for (let l = 1; l <= N_LAYERS; l++) layersEl.appendChild(seg(l, String(l), () => setLayer(l)));
+  headsEl.appendChild(seg("avg", "Avg", () => setHead("avg")));
+  for (let h = 1; h <= N_HEADS; h++) headsEl.appendChild(seg(h, String(h), () => setHead(h)));
+  viewsEl.querySelectorAll("[data-view]").forEach((b) =>
+    b.addEventListener("click", () => setView(b.dataset.view)));
+  markActive();
+}
+function seg(val, label, onClick) {
+  const b = document.createElement("button");
+  b.className = "seg-btn"; b.textContent = label; b.dataset.val = String(val);
+  b.addEventListener("click", onClick);
+  return b;
+}
+function markActive() {
+  [...layersEl.children].forEach((b) => b.classList.toggle("active", b.dataset.val === String(curLayer)));
+  [...headsEl.children].forEach((b) => b.classList.toggle("active", b.dataset.val === String(curHead)));
+  [...viewsEl.children].forEach((b) => b.classList.toggle("active", b.dataset.view === curView));
+}
+function setLayer(l) { curLayer = l; markActive(); render(); }
+function setHead(h) { curHead = h; markActive(); render(); }
+function setView(v) {
+  curView = v; markActive();
+  matrixWrap.hidden = v !== "matrix";
+  arcsWrap.hidden = v !== "arcs";
+  render();
+}
+
+/* ---------- inference ---------- */
+async function visualize() {
+  const text = sentenceEl.value.trim();
+  if (!text || !model) return;
+  vizBtn.disabled = true; vizBtn.textContent = "Running…";
+  try {
+    const inputs = await tokenizer(text);
+    const out = await model(inputs);
+    rawAtt = [];
+    for (let l = 1; l <= N_LAYERS; l++) {
+      const t = out["attention_" + l];
+      if (!t) throw new Error("attention_" + l + " not found in model output");
+      rawAtt.push({ data: t.data, dims: t.dims });   // dims = [1, heads, S, S]
+    }
+    const ids = Array.from(inputs.input_ids.data).map(Number);
+    tokens = idsToTokens(ids);
+    seq = tokens.length;
+    let truncated = false;
+    if (seq > MAX_TOKENS) { tokens = tokens.slice(0, MAX_TOKENS); seq = MAX_TOKENS; truncated = true; }
+    noteEl.hidden = !truncated;
+    if (truncated) noteEl.textContent = `Showing the first ${MAX_TOKENS} tokens (sentence was longer).`;
+    matCache.clear();
+    controls.hidden = false; vizEl.hidden = false;
+    render();
+  } catch (e) {
+    console.error(e); fail("Inference failed: " + (e?.message || e));
+  } finally {
+    vizBtn.disabled = false; vizBtn.textContent = "Visualize";
+  }
+}
+
+function idsToTokens(ids) {
+  try {
+    if (typeof tokenizer.convert_ids_to_tokens === "function") {
+      const r = tokenizer.convert_ids_to_tokens(ids);
+      if (r && r.length === ids.length) return r;
+    }
+  } catch (e) { /* fall through */ }
+  return ids.map((id) => tokenizer.decode([id]));
+}
+
+// attention matrix for a (layer, head); head === "avg" averages all heads. Cached.
+function matrix(layer, head) {
+  const key = layer + ":" + head;
+  if (matCache.has(key)) return matCache.get(key);
+  const { data, dims } = rawAtt[layer - 1];
+  const H = dims[1], S = dims[3], n = seq;
+  const M = Array.from({ length: n }, () => new Float64Array(n));
+  if (head === "avg") {
+    for (let h = 0; h < H; h++) {
+      const base = h * S * S;
+      for (let q = 0; q < n; q++) for (let k = 0; k < n; k++) M[q][k] += data[base + q * S + k] / H;
+    }
+  } else {
+    const base = (head - 1) * S * S;
+    for (let q = 0; q < n; q++) for (let k = 0; k < n; k++) M[q][k] = data[base + q * S + k];
+  }
+  matCache.set(key, M);
+  return M;
+}
+
+function maxOf(M) {
+  let m = 0;
+  for (let q = 0; q < M.length; q++) for (let k = 0; k < M.length; k++) if (M[q][k] > m) m = M[q][k];
+  return m || 1;
+}
+
+/* ---------- rendering ---------- */
+function render() {
+  if (!tokens.length) return;
+  curM = matrix(curLayer, curHead);
+  if (curView === "matrix") renderMatrix(); else renderArcs();
+}
+
+function isSpecial(t) { return t === "[CLS]" || t === "[SEP]" || t === "[PAD]"; }
+
+function renderMatrix() {
+  const M = curM, n = seq;
+  // normalize each row to its own strongest target, so every token's attention
+  // pattern is visible regardless of absolute scale (true weight stays in the tooltip).
+  const rowMax = new Array(n);
+  for (let q = 0; q < n; q++) { let m = 0; for (let k = 0; k < n; k++) if (M[q][k] > m) m = M[q][k]; rowMax[q] = m || 1; }
+  const cell = n > 30 ? 15 : n > 20 ? 19 : 25;
+  heatmap.style.setProperty("--cell", cell + "px");
+  heatmap.style.gridTemplateColumns = `var(--rowlab) repeat(${n}, var(--cell))`;
+  const frag = document.createDocumentFragment();
+
+  const corner = document.createElement("div");
+  corner.className = "corner"; corner.textContent = "from ↓ / to →";
+  frag.appendChild(corner);
+
+  for (let k = 0; k < n; k++) {
+    const d = document.createElement("div");
+    d.className = "clab" + (isSpecial(tokens[k]) ? " special" : "");
+    const s = document.createElement("span"); s.textContent = tokens[k]; d.appendChild(s);
+    d.title = tokens[k];
+    d.addEventListener("mouseenter", () => highlight("k", k));
+    d.addEventListener("mouseleave", clearHL);
+    frag.appendChild(d);
+  }
+
+  for (let q = 0; q < n; q++) {
+    const rl = document.createElement("div");
+    rl.className = "rlab" + (isSpecial(tokens[q]) ? " special" : "");
+    rl.textContent = tokens[q]; rl.title = tokens[q];
+    rl.addEventListener("mouseenter", () => highlight("q", q));
+    rl.addEventListener("mouseleave", clearHL);
+    frag.appendChild(rl);
+    for (let k = 0; k < n; k++) {
+      const c = document.createElement("div");
+      c.className = "cell"; c.dataset.q = q; c.dataset.k = k;
+      c.style.background = heat(M[q][k] / rowMax[q]);
+      frag.appendChild(c);
+    }
+  }
+  heatmap.innerHTML = "";
+  heatmap.appendChild(frag);
+}
+
+// faint -> accent (blue) -> accent-2 (violet)
+function heat(a) {
+  a = Math.max(0, Math.min(1, Math.pow(a, 0.7)));
+  const r = Math.round(110 + (139 - 110) * a);
+  const g = Math.round(168 + (124 - 168) * a);
+  const b = 255;
+  return `rgba(${r},${g},${b},${(0.06 + 0.94 * a).toFixed(3)})`;
+}
+
+function highlight(axis, idx) {
+  heatmap.classList.add("dim");
+  heatmap.querySelectorAll(".cell").forEach((c) => {
+    const match = axis === "q" ? +c.dataset.q === idx : +c.dataset.k === idx;
+    if (match) c.classList.add("hl");
+  });
+}
+function clearHL() {
+  heatmap.classList.remove("dim");
+  heatmap.querySelectorAll(".cell.hl").forEach((c) => c.classList.remove("hl"));
+}
+
+function renderArcs() {
+  const M = curM, n = seq, max = maxOf(M);
+  const rowH = n > 24 ? 20 : 26, padY = 22;
+  const w = Math.max(360, arcsWrap.clientWidth || 700);
+  const h = padY * 2 + (n - 1) * rowH;
+  const leftX = 128, rightX = w - 128;
+  const y = (i) => padY + i * rowH;
+  let s = "";
+  for (let q = 0; q < n; q++) {
+    for (let k = 0; k < n; k++) {
+      const v = M[q][k] / max;
+      if (v < 0.12) continue;
+      const mid = (leftX + rightX) / 2;
+      s += `<path class="arc" data-q="${q}" d="M ${leftX} ${y(q)} C ${mid} ${y(q)}, ${mid} ${y(k)}, ${rightX} ${y(k)}" stroke-opacity="${(v * 0.85).toFixed(3)}" stroke-width="${(0.6 + 2.6 * v).toFixed(2)}"/>`;
+    }
+  }
+  for (let i = 0; i < n; i++) {
+    const sp = isSpecial(tokens[i]) ? " special" : "";
+    const t = esc(tokens[i]);
+    s += `<text class="ltok${sp}" x="${leftX - 10}" y="${y(i)}" text-anchor="end" data-q="${i}">${t}</text>`;
+    s += `<text class="rtok${sp}" x="${rightX + 10}" y="${y(i)}" text-anchor="start">${t}</text>`;
+  }
+  arcsSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  arcsSvg.setAttribute("height", h);
+  arcsSvg.innerHTML = s;
+  arcsSvg.querySelectorAll(".ltok").forEach((node) => {
+    node.addEventListener("mouseenter", () => {
+      arcsSvg.classList.add("focus");
+      arcsSvg.querySelectorAll(".arc").forEach((a) => {
+        if (a.dataset.q === node.dataset.q) a.classList.add("on");
+      });
+    });
+    node.addEventListener("mouseleave", () => {
+      arcsSvg.classList.remove("focus");
+      arcsSvg.querySelectorAll(".arc.on").forEach((a) => a.classList.remove("on"));
+    });
+  });
+}
+
+/* ---------- tooltip ---------- */
+function showTip(e, q, k, w) {
+  tooltip.innerHTML = `<b>${esc(tokens[q])}</b> &rarr; <b>${esc(tokens[k])}</b><span>weight ${w.toFixed(3)}</span>`;
+  tooltip.style.display = "block";
+  tooltip.style.left = (e.clientX + 14) + "px";
+  tooltip.style.top = (e.clientY + 16) + "px";
+}
+function hideTip() { tooltip.style.display = "none"; }
+
+function fail(msg) { statusEl.textContent = msg; statusEl.classList.add("err"); progressWrap.style.display = ""; }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+</script>
+</body>
+</html>
