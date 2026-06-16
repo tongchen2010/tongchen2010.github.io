@@ -77,6 +77,22 @@ A few interactive demos that run **entirely in your browser** — no install, no
     </div>
   </a>
 
+  <a href="/assets/demos/tokenizer-playground.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
+    <img src="/assets/demos/tokenizer-playground.png" alt="Tokenizer Playground" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
+    <div style="padding:0.6rem 0.85rem;">
+      <strong>Tokenizer Playground</strong>
+      <div style="font-size:0.82em;opacity:0.72;margin-top:0.25rem;line-height:1.45;">See how an LLM splits text into tokens — the real GPT-4 (cl100k_base) BPE, live.</div>
+    </div>
+  </a>
+
+  <a href="/assets/demos/semantic-search-rag.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
+    <img src="/assets/demos/semantic-search-rag.png" alt="Semantic Search" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
+    <div style="padding:0.6rem 0.85rem;">
+      <strong>Semantic Search</strong>
+      <div style="font-size:0.82em;opacity:0.72;margin-top:0.25rem;line-height:1.45;">Search by meaning, not keywords — real sentence embeddings in your browser (the core of RAG).</div>
+    </div>
+  </a>
+
 </div>
 
 <div style="font-size:0.78em;opacity:0.6;margin-top:0.6rem;">Demos run best in desktop Chrome or Edge. Built with vanilla JavaScript.</div>
