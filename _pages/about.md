@@ -12,6 +12,7 @@ profile:
     <p>Department of Computer Science and Engineering</p>
     <p>The University of Texas at Arlington</p>
     <p>Arlington, TX</p>
+    <p style="margin-top:0.6em;"><a href="mailto:txc5603@mavs.uta.edu">Email</a> · <a href="https://github.com/tongchen2010" target="_blank" rel="noopener">GitHub</a> · <a href="https://scholar.google.com/citations?user=rOHUnVkAAAAJ" target="_blank" rel="noopener">Scholar</a></p>
 
 selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
