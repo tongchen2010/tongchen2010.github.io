@@ -26,7 +26,7 @@ latest_posts:
   enabled: false
 ---
 
-I am a Ph.D. candidate in Computer Science at The University of Texas at Arlington, advised by [Dr. Dajiang Zhu](https://www.uta.edu/academics/faculty/profile?username=zhud). I expect to graduate in **December 2026**.
+I am a Ph.D. candidate in Computer Science at The University of Texas at Arlington, advised by [Dr. Dajiang Zhu](https://ranger.uta.edu/~zhu/). I expect to graduate in **December 2026**.
 
 My research develops **machine learning methods for neuroimaging and neurodegenerative disease** — particularly Alzheimer's disease (AD) and Lewy body dementia (LBD), spanning the full continuum from mild cognitive impairment to dementia. I focus on:
 
