@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semantic Search — in-browser embeddings (the heart of RAG)</title>
+  <meta name="description" content="A real sentence-embedding model runs entirely in your browser and ranks text by meaning, not keywords — the retrieval step behind Retrieval-Augmented Generation (RAG)." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%236ea8fe'/><path d='M16 1a15 15 0 000 30z' fill='%238b7cff'/></svg>" />
+  <style>
+:root {
+  --bg: #0b0f17; --panel: #131927; --panel-2: #1b2336; --border: #273149;
+  --text: #e7ecf5; --muted: #93a0b8; --accent: #6ea8fe; --accent-2: #8b7cff;
+  --radius: 14px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; min-height: 100%;
+  background: radial-gradient(1200px 600px at 80% -10%, #1a2236 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 760px; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.brand { display: flex; gap: 14px; align-items: center; }
+.logo { font-size: 34px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: spin 9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
+.tagline { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; max-width: 62ch; }
+.ghlink { color: var(--muted); text-decoration: none; border: 1px solid var(--border);
+  padding: 7px 12px; border-radius: 10px; font-size: 0.85rem; white-space: nowrap; font-family: var(--mono); }
+.ghlink:hover { color: var(--text); border-color: var(--accent); }
+
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.search-row { display: flex; gap: 10px; }
+input[type="text"] { flex: 1; background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 1rem; }
+input[type="text"]:focus { outline: none; border-color: var(--accent); }
+button.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #0b0f17;
+  border: none; border-radius: 10px; padding: 11px 20px; font-weight: 700; cursor: pointer; }
+button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 999px; padding: 7px 13px; font-size: 0.83rem; cursor: pointer; }
+.chip:hover:not(:disabled) { border-color: var(--accent); }
+.chip:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.progress-wrap { margin-top: 14px; }
+.progress-bar { height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.25s ease; }
+.status { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); margin: 8px 0 0; }
+.status.err { color: #f85149; }
+.status.ready { color: #3fb950; }
+
+.results { display: flex; flex-direction: column; gap: 10px; }
+.result { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; animation: rise 0.25s ease; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.result.top { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(110,168,254,0.12); }
+.result .text { line-height: 1.5; }
+.result .meter { display: flex; align-items: center; gap: 10px; margin-top: 9px; }
+.result .bar { flex: 1; height: 7px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+.result .bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 999px; }
+.result .score { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); min-width: 3.2em; text-align: right; }
+
+.pagefoot { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 2px 0 8px; }
+a { color: var(--accent); }
+@media (max-width: 560px) { .ghlink { display: none; } }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">◵</span>
+        <div>
+          <h1>Semantic Search</h1>
+          <p class="tagline">Search by <strong>meaning, not keywords</strong>. A real embedding model (all-MiniLM-L6-v2) runs <em>in your browser</em> — this is the retrieval step behind <strong>RAG</strong>.</p>
+        </div>
+      </div>
+      <a class="ghlink" id="repo-link" href="#" target="_blank" rel="noopener">&lt;/&gt; Source</a>
+    </header>
+
+    <section class="panel">
+      <div class="search-row">
+        <input id="query" type="text" placeholder="Describe what you're looking for…" disabled />
+        <button id="search-btn" class="primary" disabled>Search</button>
+      </div>
+      <div class="examples" id="examples">
+        <button class="chip" disabled>a pet relaxing in the sun</button>
+        <button class="chip" disabled>financial markets crashing</button>
+        <button class="chip" disabled>how plants make food</button>
+        <button class="chip" disabled>software that learns from data</button>
+      </div>
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <p class="status" id="status">Loading the embedding model (~23 MB, first time only)…</p>
+      </div>
+    </section>
+
+    <main class="results" id="results"></main>
+
+    <footer class="pagefoot">
+      <span>Embeddings computed locally with <a href="https://github.com/huggingface/transformers.js" target="_blank" rel="noopener">🤗 Transformers.js</a> (all-MiniLM-L6-v2). Cosine similarity ranks the corpus by meaning. Nothing leaves your browser.</span>
+    </footer>
+  </div>
+  <script type="module">
+// Semantic Search — the retrieval step behind RAG, running fully in the browser.
+// A real sentence-embedding model (all-MiniLM-L6-v2) is loaded via Transformers.js;
+// the query and a small corpus are embedded locally and ranked by cosine similarity.
+
+const REPO_URL = "https://github.com/tongchen2010";
+const LIB_URL = "https://esm.run/@huggingface/transformers";
+const MODEL = "Xenova/all-MiniLM-L6-v2";
+
+const CORPUS = [
+  "The cat slept on the warm windowsill all afternoon.",
+  "A small feline napped in the sunshine by the glass door.",
+  "Quantum computers use qubits to perform certain calculations.",
+  "The stock market fell sharply after the surprise announcement.",
+  "Investors panicked as share prices tumbled across the board.",
+  "She baked a loaf of sourdough bread early on Sunday morning.",
+  "The recipe calls for two cups of flour, water, salt and yeast.",
+  "Photosynthesis converts sunlight into chemical energy in plants.",
+  "Leaves capture light and turn carbon dioxide into sugar.",
+  "Machine learning models generally improve with more training data.",
+  "A neural network gradually learns patterns from labeled examples.",
+  "The marathon runner crossed the finish line utterly exhausted.",
+];
+
+const $ = (id) => document.getElementById(id);
+const query = $("query"), searchBtn = $("search-btn"), results = $("results"),
+  statusEl = $("status"), fill = $("progress-fill"), progressWrap = $("progress-wrap");
+$("repo-link").href = REPO_URL;
+
+let extractor = null, corpusEmb = [];
+
+init();
+async function init() {
+  let transformers;
+  try {
+    transformers = await import(LIB_URL);
+  } catch (e) {
+    return fail("Couldn't load Transformers.js (are you online?).");
+  }
+  try {
+    extractor = await transformers.pipeline("feature-extraction", MODEL, {
+      progress_callback: (r) => {
+        if (r.status === "progress" && r.progress != null) {
+          fill.style.width = r.progress + "%";
+          statusEl.textContent = `Downloading ${r.file || "model"}… ${Math.round(r.progress)}%`;
+        }
+      },
+    });
+    fill.style.width = "100%";
+    statusEl.textContent = "Embedding the corpus…";
+    corpusEmb = await Promise.all(CORPUS.map(embed));
+    ready();
+  } catch (e) {
+    console.error(e);
+    fail("Failed to load the model: " + (e?.message || e));
+  }
+}
+
+async function embed(text) {
+  const out = await extractor(text, { pooling: "mean", normalize: true });
+  return Array.from(out.data);
+}
+
+const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+
+async function search() {
+  const q = query.value.trim();
+  if (!q || !extractor) return;
+  searchBtn.disabled = true;
+  const qv = await embed(q);
+  const ranked = CORPUS
+    .map((text, i) => ({ text, score: dot(qv, corpusEmb[i]) }))
+    .sort((a, b) => b.score - a.score);
+  const top = ranked[0].score;
+  results.innerHTML = "";
+  ranked.forEach((r, i) => {
+    const w = Math.max(2, (r.score / (top || 1)) * 100);
+    const el = document.createElement("div");
+    el.className = "result" + (i === 0 ? " top" : "");
+    el.innerHTML = `<div class="text">${esc(r.text)}</div>
+      <div class="meter"><div class="bar"><div style="width:${w}%"></div></div>
+      <span class="score">${r.score.toFixed(3)}</span></div>`;
+    results.appendChild(el);
+  });
+  searchBtn.disabled = false;
+}
+
+function ready() {
+  progressWrap.style.display = "none";
+  query.disabled = false; searchBtn.disabled = false;
+  document.querySelectorAll(".chip").forEach((c) => {
+    c.disabled = false;
+    c.addEventListener("click", () => { query.value = c.textContent; search(); });
+  });
+  query.addEventListener("keydown", (e) => { if (e.key === "Enter") search(); });
+  searchBtn.addEventListener("click", search);
+  query.focus();
+}
+
+function fail(msg) { statusEl.textContent = msg; statusEl.classList.add("err"); }
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+</script>
+</body>
+</html>

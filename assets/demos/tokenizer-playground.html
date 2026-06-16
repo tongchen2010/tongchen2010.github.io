@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tokenizer Playground — see how an LLM reads your text</title>
+  <meta name="description" content="See how a large language model splits text into tokens, using the real GPT-4 (cl100k_base) byte-pair encoding, live in your browser." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%236ea8fe'/><path d='M16 1a15 15 0 000 30z' fill='%238b7cff'/></svg>" />
+  <style>
+:root {
+  --bg: #0b0f17; --panel: #131927; --panel-2: #1b2336; --border: #273149;
+  --text: #e7ecf5; --muted: #93a0b8; --accent: #6ea8fe; --accent-2: #8b7cff;
+  --radius: 14px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; min-height: 100%;
+  background: radial-gradient(1200px 600px at 80% -10%, #1a2236 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 820px; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.brand { display: flex; gap: 14px; align-items: center; }
+.logo { font-size: 34px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: spin 9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
+.tagline { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; max-width: 60ch; }
+code { font-family: var(--mono); background: var(--panel-2); padding: 1px 5px; border-radius: 5px; font-size: 0.85em; }
+.ghlink { color: var(--muted); text-decoration: none; border: 1px solid var(--border);
+  padding: 7px 12px; border-radius: 10px; font-size: 0.85rem; white-space: nowrap; font-family: var(--mono); }
+.ghlink:hover { color: var(--text); border-color: var(--accent); }
+
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+textarea {
+  width: 100%; resize: vertical; min-height: 90px;
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 1rem; line-height: 1.55;
+}
+textarea:focus { outline: none; border-color: var(--accent); }
+
+.stats { display: flex; align-items: center; gap: 22px; margin-top: 14px; flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; }
+.stat span { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.stat label { color: var(--muted); font-size: 0.74rem; margin-top: 3px; }
+.toggle { margin-left: auto; display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+.seg { background: transparent; color: var(--muted); border: none; padding: 8px 14px; cursor: pointer; font-size: 0.85rem; }
+.seg.active { background: var(--accent); color: #0b0f17; font-weight: 700; }
+.status { color: var(--muted); font-size: 0.8rem; margin-top: 10px; font-family: var(--mono); }
+.status.err { color: #f85149; }
+
+.output { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; line-height: 2.1; min-height: 120px; word-break: break-all; }
+.tok { display: inline-block; border-radius: 5px; padding: 2px 1px; margin: 1px 0; white-space: pre-wrap; }
+.tok.id { font-family: var(--mono); font-size: 0.82rem; padding: 2px 6px; margin: 2px; }
+.space { opacity: 0.45; }
+
+.pagefoot { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 2px 0 8px; }
+a { color: var(--accent); }
+@media (max-width: 560px) { .ghlink { display: none; } }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">◕</span>
+        <div>
+          <h1>Tokenizer Playground</h1>
+          <p class="tagline">See how an LLM actually reads your text — split into <strong>tokens</strong> with the real GPT-4 (<code>cl100k_base</code>) byte-pair encoding, live in your browser.</p>
+        </div>
+      </div>
+      <a class="ghlink" id="repo-link" href="#" target="_blank" rel="noopener">&lt;/&gt; Source</a>
+    </header>
+
+    <section class="panel">
+      <textarea id="input" rows="4" spellcheck="false">Tokenization is how an LLM turns text into numbers. Notice how " tokenization", spaces, and emojis 🚀 get split — and that GPT-4o counts 1,234 as separate pieces!</textarea>
+      <div class="stats">
+        <div class="stat"><span id="tok-count">0</span><label>tokens</label></div>
+        <div class="stat"><span id="char-count">0</span><label>characters</label></div>
+        <div class="stat"><span id="ratio">0</span><label>chars / token</label></div>
+        <div class="toggle">
+          <button id="view-text" class="seg active">Pieces</button>
+          <button id="view-ids" class="seg">Token IDs</button>
+        </div>
+      </div>
+      <div class="status" id="status">Loading tokenizer…</div>
+    </section>
+
+    <main class="output" id="output"></main>
+
+    <footer class="pagefoot">
+      <span>Uses <a href="https://github.com/niieani/gpt-tokenizer" target="_blank" rel="noopener">gpt-tokenizer</a> (<code>cl100k_base</code>, the GPT-3.5/GPT-4 encoding). Everything runs locally — your text never leaves the page.</span>
+    </footer>
+  </div>
+  <script type="module">
+// Tokenizer Playground — tokenize text with the real GPT-4 (cl100k_base) BPE,
+// entirely in the browser. Shows each token as a colored chip so you can see
+// exactly where the model splits words, spaces, numbers and emoji.
+
+const REPO_URL = "https://github.com/tongchen2010";
+const TOK_URL = "https://esm.run/gpt-tokenizer"; // cl100k_base (GPT-3.5 / GPT-4)
+
+const COLORS = [
+  "rgba(110,168,254,0.28)", "rgba(139,124,255,0.28)", "rgba(63,185,80,0.28)",
+  "rgba(210,153,34,0.28)", "rgba(224,108,159,0.28)", "rgba(86,199,199,0.28)",
+];
+
+const $ = (id) => document.getElementById(id);
+const input = $("input"), output = $("output"), statusEl = $("status");
+const tokCount = $("tok-count"), charCount = $("char-count"), ratioEl = $("ratio");
+const viewText = $("view-text"), viewIds = $("view-ids");
+$("repo-link").href = REPO_URL;
+
+let encode = null, decode = null, mode = "text";
+
+init();
+async function init() {
+  try {
+    const mod = await import(TOK_URL);
+    encode = mod.encode;
+    decode = mod.decode;
+  } catch (e) {
+    statusEl.textContent = "Couldn't load the tokenizer library (are you online?).";
+    statusEl.classList.add("err");
+    console.error(e);
+    return;
+  }
+  statusEl.textContent = "Tokenizer ready (cl100k_base). Type above to tokenize.";
+  input.addEventListener("input", debounce(render, 120));
+  viewText.addEventListener("click", () => setMode("text"));
+  viewIds.addEventListener("click", () => setMode("ids"));
+  render();
+}
+
+function setMode(m) {
+  mode = m;
+  viewText.classList.toggle("active", m === "text");
+  viewIds.classList.toggle("active", m === "ids");
+  render();
+}
+
+function render() {
+  if (!encode) return;
+  const text = input.value;
+  const ids = text ? encode(text) : [];
+  tokCount.textContent = ids.length.toLocaleString();
+  charCount.textContent = text.length.toLocaleString();
+  ratioEl.textContent = ids.length ? (text.length / ids.length).toFixed(2) : "0";
+
+  output.innerHTML = "";
+  ids.forEach((id, i) => {
+    const span = document.createElement("span");
+    span.className = "tok" + (mode === "ids" ? " id" : "");
+    span.style.background = COLORS[i % COLORS.length];
+    if (mode === "ids") {
+      span.textContent = String(id);
+    } else {
+      let piece = "�";
+      try { piece = decode([id]); } catch (e) { /* partial byte token */ }
+      // make newlines visible while still breaking the line
+      span.textContent = piece.replace(/\n/g, "⏎\n");
+    }
+    span.title = `token #${i + 1} · id ${id}`;
+    output.appendChild(span);
+  });
+}
+
+function debounce(fn, ms) {
+  let t;
+  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+
+</script>
+</body>
+</html>
