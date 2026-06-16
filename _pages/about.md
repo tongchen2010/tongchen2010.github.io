@@ -38,3 +38,45 @@ My work has appeared in *NeuroImage*, **MICCAI**, and **IEEE ISBI**, with multip
 Before UTA, I received my M.S. and B.S. in Computer Science from Kennesaw State University, where I worked on computer vision and deep learning with Dr. Junggab Son and Dr. Jiho Noh.
 
 **I am on the job market for faculty and postdoctoral positions starting in 2027.** Feel free to reach out!
+
+## Interactive AI/ML Demos
+
+A few interactive demos that run **entirely in your browser** — no install, no sign-up. Click a card to try one live.
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1.2rem;">
+
+  <a href="/assets/demos/browser-llm-chat.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
+    <img src="/assets/demos/browser-llm-chat.png" alt="Browser LLM Chat" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
+    <div style="padding:0.6rem 0.85rem;">
+      <strong>Browser LLM Chat</strong>
+      <div style="font-size:0.82em;opacity:0.72;margin-top:0.25rem;line-height:1.45;">A ChatGPT-style assistant running 100% in your browser via WebGPU — no server, no API key.</div>
+    </div>
+  </a>
+
+  <a href="/assets/demos/llm-agent-visualizer.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
+    <img src="/assets/demos/llm-agent-visualizer.png" alt="LLM Agent Visualizer" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
+    <div style="padding:0.6rem 0.85rem;">
+      <strong>LLM Agent Visualizer</strong>
+      <div style="font-size:0.82em;opacity:0.72;margin-top:0.25rem;line-height:1.45;">Watch an LLM agent reason step by step — the Reason → Act → Observe (ReAct) loop, animated.</div>
+    </div>
+  </a>
+
+  <a href="/assets/demos/neural-net-playground.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
+    <img src="/assets/demos/neural-net-playground.png" alt="Neural Net Playground" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
+    <div style="padding:0.6rem 0.85rem;">
+      <strong>Neural Net Playground</strong>
+      <div style="font-size:0.82em;opacity:0.72;margin-top:0.25rem;line-height:1.45;">Train a neural network from scratch (backprop hand-written in JS) and watch it learn.</div>
+    </div>
+  </a>
+
+  <a href="/assets/demos/llm-knowledge-graph.html" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;">
+    <img src="/assets/demos/llm-knowledge-graph.png" alt="LLM Knowledge Graph" loading="lazy" style="width:100%;display:block;aspect-ratio:16/11;object-fit:cover;object-position:top;">
+    <div style="padding:0.6rem 0.85rem;">
+      <strong>LLM Knowledge Graph</strong>
+      <div style="font-size:0.82em;opacity:0.72;margin-top:0.25rem;line-height:1.45;">Turn any topic into an interactive force-directed knowledge graph (D3).</div>
+    </div>
+  </a>
+
+</div>
+
+<div style="font-size:0.78em;opacity:0.6;margin-top:0.6rem;">Demos run best in desktop Chrome or Edge. Built with vanilla JavaScript.</div>

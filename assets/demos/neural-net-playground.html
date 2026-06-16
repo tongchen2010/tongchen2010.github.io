@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neural Net Playground — backprop from scratch, in your browser</title>
+  <meta name="description" content="Train a small neural network from scratch in your browser and watch the decision boundary form as it learns. No ML library — forward pass, backprop and SGD hand-written in JS." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%236ea8fe'/><path d='M16 1a15 15 0 000 30z' fill='%238b7cff'/></svg>" />
+  <style>
+:root {
+  --bg: #0b0f17; --panel: #131927; --panel-2: #1b2336; --border: #273149;
+  --text: #e7ecf5; --muted: #93a0b8; --accent: #6ea8fe; --accent-2: #8b7cff;
+  --c0: #e8833a; --c1: #5a9cff;
+  --radius: 14px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; min-height: 100%;
+  background: radial-gradient(1200px 600px at 80% -10%, #1a2236 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 860px; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.brand { display: flex; gap: 14px; align-items: center; }
+.logo { font-size: 34px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: spin 9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
+.tagline { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; max-width: 60ch; }
+.ghlink { color: var(--muted); text-decoration: none; border: 1px solid var(--border);
+  padding: 7px 12px; border-radius: 10px; font-size: 0.85rem; white-space: nowrap; font-family: var(--mono); }
+.ghlink:hover { color: var(--text); border-color: var(--accent); }
+
+.controls { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.ctrl { display: flex; flex-direction: column; gap: 6px; }
+.ctrl label { font-size: 0.78rem; color: var(--muted); }
+select { background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 9px; padding: 8px 10px; font-size: 0.88rem; }
+input[type="range"] { accent-color: var(--accent); width: 130px; }
+.btns { display: flex; gap: 8px; margin-left: auto; }
+button { cursor: pointer; font-size: 0.9rem; border-radius: 10px; padding: 9px 16px; }
+button.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #0b0f17; border: none; font-weight: 700; }
+button.primary:hover { filter: brightness(1.08); }
+button.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+button.ghost:hover { border-color: var(--accent); }
+
+.stage { display: flex; gap: 16px; flex-wrap: wrap; }
+.canvas-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+#board { width: 380px; height: 380px; max-width: 100%; border-radius: 10px; display: block; background: #0a0e16; }
+.legend { display: flex; gap: 16px; justify-content: center; margin-top: 10px; font-size: 0.8rem; color: var(--muted); }
+.legend i.dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; vertical-align: -1px; margin-right: 4px; }
+.dot.c0 { background: var(--c0); } .dot.c1 { background: var(--c1); }
+
+.panel { flex: 1; min-width: 220px; background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.stat { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.stat-k { color: var(--muted); font-size: 0.82rem; }
+.stat-v { font-family: var(--mono); font-size: 1.15rem; font-weight: 700; }
+.loss-box { display: flex; flex-direction: column; gap: 6px; }
+#loss-curve { width: 100%; height: 80px; background: #0a0e16; border: 1px solid var(--border); border-radius: 8px; }
+.note { color: var(--muted); font-size: 0.78rem; line-height: 1.5; margin: auto 0 0; }
+code { font-family: var(--mono); background: var(--panel-2); padding: 2px 6px; border-radius: 6px; font-size: 0.85em; }
+.pagefoot { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 2px 0 8px; }
+a { color: var(--accent); }
+@media (max-width: 560px) { .ghlink { display: none; } .btns { margin-left: 0; } }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">◓</span>
+        <div>
+          <h1>Neural Net Playground</h1>
+          <p class="tagline">Train a neural network <strong>from scratch</strong> in your browser — watch the decision boundary form as it learns. Backprop hand-written in JS, <em>no ML library</em>.</p>
+        </div>
+      </div>
+      <a class="ghlink" id="repo-link" href="#" target="_blank" rel="noopener">&lt;/&gt; Source</a>
+    </header>
+
+    <section class="controls">
+      <div class="ctrl"><label for="dataset">Dataset</label>
+        <select id="dataset">
+          <option value="circle">Circle</option>
+          <option value="xor">XOR</option>
+          <option value="moons">Two Moons</option>
+          <option value="spiral">Spiral</option>
+          <option value="gauss">Gaussian (linear)</option>
+        </select>
+      </div>
+      <div class="ctrl"><label for="arch">Hidden layers</label>
+        <select id="arch">
+          <option value="">none (linear)</option>
+          <option value="4">1 × 4</option>
+          <option value="8">1 × 8</option>
+          <option value="8,8" selected>2 × 8</option>
+          <option value="16,8">16 → 8</option>
+        </select>
+      </div>
+      <div class="ctrl"><label for="act">Activation</label>
+        <select id="act">
+          <option value="tanh" selected>tanh</option>
+          <option value="relu">ReLU</option>
+          <option value="sigmoid">sigmoid</option>
+        </select>
+      </div>
+      <div class="ctrl"><label for="lr">Learning rate: <span id="lr-val">0.8</span></label>
+        <input type="range" id="lr" min="0.1" max="2" step="0.1" value="0.8" />
+      </div>
+      <div class="btns">
+        <button id="play-btn" class="primary">▶ Train</button>
+        <button id="step-btn" class="ghost">Step</button>
+        <button id="reset-btn" class="ghost">Reset</button>
+      </div>
+    </section>
+
+    <main class="stage">
+      <div class="canvas-wrap">
+        <canvas id="board" width="380" height="380"></canvas>
+        <div class="legend">
+          <span><i class="dot c1"></i> class 1</span>
+          <span><i class="dot c0"></i> class 0</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="stat"><span class="stat-k">Epoch</span><span class="stat-v" id="epoch">0</span></div>
+        <div class="stat"><span class="stat-k">Train loss</span><span class="stat-v" id="loss">—</span></div>
+        <div class="stat"><span class="stat-k">Train accuracy</span><span class="stat-v" id="acc">—</span></div>
+        <div class="loss-box">
+          <span class="stat-k">Loss curve</span>
+          <canvas id="loss-curve" width="240" height="80"></canvas>
+        </div>
+        <p class="note">Each pixel is colored by the network's prediction; dots are the training data. Everything — forward pass, backpropagation, SGD — runs in <code>app.js</code> with no dependencies.</p>
+      </div>
+    </main>
+
+    <footer class="pagefoot">
+      <span>Inspired by the TensorFlow Playground — but the network here is implemented by hand, end to end.</span>
+    </footer>
+  </div>
+  <script type="module">
+// Neural Net Playground — a small MLP implemented from scratch (forward pass,
+// backpropagation, SGD) trained live in the browser on 2-D toy datasets, with
+// the decision boundary drawn to a canvas as it learns. No ML library.
+
+const REPO_URL = "https://github.com/tongchen2010";
+
+// ---------- the network (verified by /tmp/test_net.js) ----------
+const ACT = {
+  tanh:    { f: (x) => Math.tanh(x),           df: (y) => 1 - y * y },
+  relu:    { f: (x) => (x > 0 ? x : 0),        df: (y) => (y > 0 ? 1 : 0) },
+  sigmoid: { f: (x) => 1 / (1 + Math.exp(-x)), df: (y) => y * (1 - y) },
+};
+
+function makeNet(sizes, act) {
+  const layers = [];
+  for (let l = 1; l < sizes.length; l++) {
+    const inN = sizes[l - 1], outN = sizes[l];
+    const scale = Math.sqrt(2 / (inN + outN));
+    const W = Array.from({ length: outN }, () =>
+      Array.from({ length: inN }, () => (Math.random() * 2 - 1) * scale));
+    const b = Array.from({ length: outN }, () => 0);
+    layers.push({ W, b });
+  }
+  return { layers, act };
+}
+
+function forwardActs(net, x) {
+  const acts = [x];
+  let a = x;
+  const L = net.layers.length;
+  for (let l = 0; l < L; l++) {
+    const { W, b } = net.layers[l];
+    const fn = l === L - 1 ? ACT.sigmoid : ACT[net.act];
+    a = W.map((row, i) => fn.f(row.reduce((s, w, j) => s + w * a[j], 0) + b[i]));
+    acts.push(a);
+  }
+  return acts;
+}
+
+const predict = (net, x) => forwardActs(net, x)[net.layers.length][0];
+
+function trainStep(net, X, Y, lr) {
+  const L = net.layers.length;
+  const gW = net.layers.map((ly) => ly.W.map((r) => r.map(() => 0)));
+  const gb = net.layers.map((ly) => ly.b.map(() => 0));
+  let loss = 0, correct = 0;
+  for (let n = 0; n < X.length; n++) {
+    const acts = forwardActs(net, X[n]);
+    const out = acts[L][0], y = Y[n], eps = 1e-7;
+    loss += -(y * Math.log(out + eps) + (1 - y) * Math.log(1 - out + eps));
+    if ((out >= 0.5 ? 1 : 0) === y) correct++;
+    let delta = [out - y];
+    for (let l = L - 1; l >= 0; l--) {
+      const W = net.layers[l].W, aPrev = acts[l];
+      for (let i = 0; i < W.length; i++) {
+        gb[l][i] += delta[i];
+        for (let j = 0; j < W[i].length; j++) gW[l][i][j] += delta[i] * aPrev[j];
+      }
+      if (l > 0) {
+        const df = ACT[net.act].df, dPrev = new Array(aPrev.length).fill(0);
+        for (let j = 0; j < aPrev.length; j++) {
+          let s = 0;
+          for (let i = 0; i < W.length; i++) s += delta[i] * W[i][j];
+          dPrev[j] = s * df(aPrev[j]);
+        }
+        delta = dPrev;
+      }
+    }
+  }
+  const m = X.length;
+  for (let l = 0; l < L; l++) {
+    const ly = net.layers[l];
+    for (let i = 0; i < ly.W.length; i++) {
+      ly.b[i] -= (lr * gb[l][i]) / m;
+      for (let j = 0; j < ly.W[i].length; j++) ly.W[i][j] -= (lr * gW[l][i][j]) / m;
+    }
+  }
+  return { loss: loss / m, acc: correct / m };
+}
+
+// ---------- datasets in [-1, 1] ----------
+const rnd = (a, b) => a + Math.random() * (b - a);
+const DATASETS = {
+  gauss(n = 220) { const X = [], Y = []; for (let i = 0; i < n; i++) { const c = i % 2, m = c ? 0.45 : -0.45; X.push([m + rnd(-0.22, 0.22), m + rnd(-0.22, 0.22)]); Y.push(c); } return { X, Y }; },
+  circle(n = 240) { const X = [], Y = []; for (let i = 0; i < n; i++) { const c = i % 2, r = c ? rnd(0, 0.4) : rnd(0.6, 0.95), t = rnd(0, 2 * Math.PI); X.push([r * Math.cos(t), r * Math.sin(t)]); Y.push(c); } return { X, Y }; },
+  xor(n = 240) { const X = [], Y = []; for (let i = 0; i < n; i++) { const x = rnd(-1, 1), y = rnd(-1, 1); X.push([x, y]); Y.push((x > 0) !== (y > 0) ? 1 : 0); } return { X, Y }; },
+  moons(n = 240) { const X = [], Y = []; for (let i = 0; i < n; i++) { const c = i % 2, t = rnd(0, Math.PI), nx = rnd(-0.06, 0.06), ny = rnd(-0.06, 0.06); if (c) X.push([Math.cos(t) - 0.4 + nx, -Math.sin(t) + 0.18 + ny]); else X.push([Math.cos(t) + 0.4 + nx, Math.sin(t) - 0.18 + ny]); Y.push(c); } return { X, Y }; },
+  spiral(n = 240) { const X = [], Y = []; const per = n / 2; for (let c = 0; c < 2; c++) for (let i = 0; i < per; i++) { const r = i / per * 0.95, t = c * Math.PI + i / per * 3.2 + rnd(-0.18, 0.18); X.push([r * Math.cos(t), r * Math.sin(t)]); Y.push(c); } return { X, Y }; },
+};
+
+// ---------- DOM ----------
+const $ = (id) => document.getElementById(id);
+const board = $("board"), lossCurve = $("loss-curve");
+const dsSel = $("dataset"), archSel = $("arch"), actSel = $("act"), lr = $("lr"), lrVal = $("lr-val");
+const playBtn = $("play-btn"), stepBtn = $("step-btn"), resetBtn = $("reset-btn");
+const epochEl = $("epoch"), lossEl = $("loss"), accEl = $("acc");
+$("repo-link").href = REPO_URL;
+
+const ctx = board.getContext("2d");
+const lctx = lossCurve.getContext("2d");
+const SIZE = 380, DOMAIN = 1.12, RES = 58;
+let net, data, playing = false, epoch = 0, lossHist = [], raf = null;
+
+function dpr() { return window.devicePixelRatio || 1; }
+function setupCanvas() {
+  const r = dpr();
+  board.width = SIZE * r; board.height = SIZE * r;
+  ctx.setTransform(r, 0, 0, r, 0, 0);
+  lossCurve.width = lossCurve.clientWidth * r; lossCurve.height = 80 * r;
+  lctx.setTransform(r, 0, 0, r, 0, 0);
+}
+const toPx = (v) => ((v / DOMAIN) * 0.5 + 0.5) * SIZE;
+
+function archSizes() {
+  const hidden = archSel.value ? archSel.value.split(",").map(Number) : [];
+  return [2, ...hidden, 1];
+}
+
+function rebuild() {
+  data = DATASETS[dsSel.value]();
+  net = makeNet(archSizes(), actSel.value);
+  epoch = 0; lossHist = [];
+  epochEl.textContent = "0"; lossEl.textContent = "—"; accEl.textContent = "—";
+  draw(); drawLoss();
+}
+
+function reinit() {
+  net = makeNet(archSizes(), actSel.value);
+  epoch = 0; lossHist = [];
+  epochEl.textContent = "0"; lossEl.textContent = "—"; accEl.textContent = "—";
+  draw(); drawLoss();
+}
+
+function colorFor(p) {
+  const o = [232, 131, 58], b = [90, 156, 255];
+  const r = Math.round(o[0] + (b[0] - o[0]) * p);
+  const g = Math.round(o[1] + (b[1] - o[1]) * p);
+  const bl = Math.round(o[2] + (b[2] - o[2]) * p);
+  return `rgba(${r},${g},${bl},0.5)`;
+}
+
+function draw() {
+  // decision-boundary heatmap
+  const cell = SIZE / RES;
+  for (let gx = 0; gx < RES; gx++) {
+    for (let gy = 0; gy < RES; gy++) {
+      const x = ((gx + 0.5) / RES * 2 - 1) * DOMAIN;
+      const y = -((gy + 0.5) / RES * 2 - 1) * DOMAIN;
+      ctx.fillStyle = colorFor(predict(net, [x, y]));
+      ctx.fillRect(gx * cell, gy * cell, cell + 1, cell + 1);
+    }
+  }
+  // data points
+  for (let i = 0; i < data.X.length; i++) {
+    const [x, y] = data.X[i];
+    ctx.beginPath();
+    ctx.arc(toPx(x), toPx(-y), 4, 0, 2 * Math.PI);
+    ctx.fillStyle = data.Y[i] ? "#5a9cff" : "#e8833a";
+    ctx.fill();
+    ctx.lineWidth = 1; ctx.strokeStyle = "rgba(0,0,0,0.55)"; ctx.stroke();
+  }
+}
+
+function drawLoss() {
+  const w = lossCurve.clientWidth, h = 80;
+  lctx.clearRect(0, 0, w, h);
+  if (lossHist.length < 2) return;
+  const show = lossHist.slice(-200);
+  const max = Math.max(...show), min = Math.min(...show);
+  const span = max - min || 1;
+  lctx.beginPath();
+  show.forEach((v, i) => {
+    const px = (i / (show.length - 1)) * w;
+    const py = h - ((v - min) / span) * (h - 10) - 5;
+    i ? lctx.lineTo(px, py) : lctx.moveTo(px, py);
+  });
+  lctx.strokeStyle = "#6ea8fe"; lctx.lineWidth = 2; lctx.stroke();
+}
+
+function tick(steps) {
+  let m = null;
+  for (let s = 0; s < steps; s++) { m = trainStep(net, data.X, data.Y, parseFloat(lr.value)); epoch++; lossHist.push(m.loss); }
+  epochEl.textContent = String(epoch);
+  lossEl.textContent = m.loss.toFixed(3);
+  accEl.textContent = (m.acc * 100).toFixed(1) + "%";
+  draw(); drawLoss();
+}
+
+function loop() {
+  if (!playing) return;
+  tick(3);
+  raf = requestAnimationFrame(loop);
+}
+
+function play() {
+  playing = !playing;
+  playBtn.textContent = playing ? "⏸ Pause" : "▶ Train";
+  if (playing) loop(); else if (raf) cancelAnimationFrame(raf);
+}
+
+// ---------- events ----------
+dsSel.addEventListener("change", () => { stop(); rebuild(); });
+archSel.addEventListener("change", () => { stop(); reinit(); });
+actSel.addEventListener("change", () => { stop(); reinit(); });
+lr.addEventListener("input", () => (lrVal.textContent = lr.value));
+playBtn.addEventListener("click", play);
+stepBtn.addEventListener("click", () => { if (!playing) tick(5); });
+resetBtn.addEventListener("click", () => { stop(); reinit(); });
+window.addEventListener("resize", () => { setupCanvas(); draw(); drawLoss(); });
+
+function stop() {
+  playing = false; playBtn.textContent = "▶ Train";
+  if (raf) cancelAnimationFrame(raf);
+}
+
+// ---------- boot ----------
+setupCanvas();
+rebuild();
+
+</script>
+</body>
+</html>
