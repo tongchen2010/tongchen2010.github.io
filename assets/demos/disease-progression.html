@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disease Progression Explorer — continuous staging on a live brain network</title>
+  <meta name="description" content="Slide along the cognitive-impairment continuum, from cognitively normal through MCI to dementia, and watch the atrophy spread across a live brain network — differently for Alzheimer's disease and Lewy body dementia. An illustrative model of continuous, unified disease staging, in your browser." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='16' r='9' fill='%236ea8fe'/><circle cx='21' cy='16' r='9' fill='%23ef4444' fill-opacity='0.9'/></svg>" />
+  <style>
+:root {
+  --bg: #0b0f17; --panel: #131927; --panel-2: #1b2336; --border: #273149;
+  --text: #e7ecf5; --muted: #93a0b8; --accent: #6ea8fe;
+  --ad: #6ea8fe; --lbd: #e8833a; --hot: #ef4444;
+  --radius: 14px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; min-height: 100%;
+  background: radial-gradient(1200px 600px at 80% -10%, #1a2236 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 940px; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.topbar { display: flex; gap: 14px; align-items: center; }
+.logo { font-size: 28px; line-height: 1; }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
+.tagline { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; max-width: 66ch; line-height: 1.5; }
+
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+
+.seg-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 7px; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.seg button { background: var(--panel-2); color: var(--muted); border: none; padding: 8px 18px;
+  font-size: 0.9rem; font-family: inherit; cursor: pointer; font-weight: 600; }
+.seg button.on[data-d="AD"] { background: var(--ad); color: #071018; }
+.seg button.on[data-d="LBD"] { background: var(--lbd); color: #1a0f04; }
+
+.axis-wrap { margin-top: 16px; }
+.axis-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 12px; border-radius: 8px;
+  background: linear-gradient(90deg, #3fb950 0%, #d29922 48%, #ef6f6f 100%); cursor: pointer; outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.5); cursor: grab; }
+input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+.ticks { display: flex; justify-content: space-between; margin-top: 9px; font-size: 0.76rem; color: var(--muted); }
+.readout { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 16px; align-items: baseline; }
+.stage-pill { font-size: 0.95rem; font-weight: 700; padding: 5px 14px; border-radius: 22px; background: var(--panel-2); border: 1px solid var(--border); }
+.metric { font-size: 0.86rem; color: var(--muted); }
+.metric b { color: var(--text); font-family: var(--mono); font-size: 0.95rem; }
+
+.stage-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+.graph-card { position: relative; flex: 3 1 460px; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; min-width: 300px; }
+#graph { width: 100%; height: 480px; display: block; cursor: grab; }
+#graph:active { cursor: grabbing; }
+.legend { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 2px;
+  background: rgba(11,15,23,0.72); border: 1px solid var(--border); border-radius: 10px; padding: 7px 8px;
+  font-size: 0.7rem; color: var(--muted); backdrop-filter: blur(4px); }
+.legend .row { display: flex; align-items: center; gap: 6px; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.legend .sep { border-top: 1px solid var(--border); margin: 4px 0 2px; padding-top: 4px; }
+.grad { width: 46px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--muted), var(--hot)); display: inline-block; vertical-align: -1px; }
+.hud { position: absolute; bottom: 8px; left: 12px; right: 12px; text-align: center; font-size: 0.72rem; color: var(--muted); pointer-events: none; }
+.node circle { stroke: #0a0e16; stroke-width: 1.2px; cursor: pointer; }
+.node text { fill: var(--text); font-size: 9px; pointer-events: none; paint-order: stroke; stroke: #0b0f17; stroke-width: 3px; stroke-linejoin: round; opacity: 0; }
+.node.show text { opacity: 0.9; }
+.link { stroke: #38445e; }
+
+/* leading-regions side panel */
+.side { flex: 1 1 220px; min-width: 200px; }
+.side h3 { font-size: 0.82rem; color: var(--muted); font-weight: 600; margin: 0 0 3px; }
+.side .sub { font-size: 0.72rem; color: var(--muted); opacity: 0.7; margin: 0 0 12px; }
+.lr-row { margin: 8px 0; }
+.lr-name { font-size: 0.78rem; display: flex; justify-content: space-between; margin-bottom: 3px; }
+.lr-name span:last-child { font-family: var(--mono); color: var(--muted); font-size: 0.72rem; }
+.lr-track { height: 8px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.lr-fill { height: 100%; transition: width 0.18s ease, background 0.2s; }
+.interp { margin-top: 14px; font-size: 0.82rem; line-height: 1.55; color: var(--text); opacity: 0.9; border-left: 3px solid var(--border); padding: 2px 0 2px 12px; }
+
+.pagefoot { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 2px 0 8px; line-height: 1.55; }
+@media (max-width: 620px) { #graph { height: 380px; } }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <span class="logo">🧠</span>
+      <div>
+        <h1>Disease Progression Explorer</h1>
+        <p class="tagline">Slide along the <strong>cognitive-impairment continuum</strong> — cognitively normal → MCI → dementia — and watch atrophy spread across a live brain network. Toggle Alzheimer's vs Lewy body dementia: two diseases trace <em>different</em> anatomical paths along one shared staging axis.</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="seg-label">Disease trajectory</div>
+      <div class="seg" id="seg">
+        <button data-d="AD" class="on">Alzheimer's (AD)</button>
+        <button data-d="LBD">Lewy body (LBD)</button>
+      </div>
+      <div class="axis-wrap">
+        <div class="axis-label">Continuous disease stage — drag the handle</div>
+        <input id="stage" type="range" min="0" max="100" value="42" />
+        <div class="ticks"><span>Cognitively normal</span><span>MCI</span><span>Dementia</span></div>
+      </div>
+      <div class="readout">
+        <span class="stage-pill" id="stageName">—</span>
+        <span class="metric">MMSE <b id="mmse">—</b> <span style="opacity:0.6">/ 30</span></span>
+        <span class="metric">CDR-SB <b id="cdr">—</b> <span style="opacity:0.6">/ 18</span></span>
+      </div>
+    </section>
+
+    <div class="stage-grid">
+      <main class="graph-card">
+        <svg id="graph" role="img" aria-label="Brain network coloured by disease involvement"></svg>
+        <div class="legend" id="legend"></div>
+        <div class="hud">Drag nodes · scroll to zoom · click a region for details</div>
+      </main>
+      <aside class="side card">
+        <h3 id="sideTitle">Most-involved regions</h3>
+        <p class="sub">at the current stage</p>
+        <div id="leading"></div>
+        <p class="interp" id="interp"></p>
+      </aside>
+    </div>
+
+    <footer class="pagefoot">
+      <span>An <strong>illustrative</strong> model of continuous, unified disease staging. Regional involvement follows the established imaging literature (AD: medial-temporal &amp; default-mode; LBD: relative hippocampal sparing with occipital &amp; subcortical involvement); nodes redden and the network thins as disease advances. Not a real scan, cognitive scores are schematic, <strong>not a diagnostic tool</strong>. This is the kind of representation my <em>Unified Continuous Staging</em> research learns from brain MRI.</span>
+    </footer>
+  </div>
+
+  <script type="module">
+// Disease Progression Explorer — the connectome from my brain-network demo, now driven
+// by a continuous staging slider. Each region's involvement at the current stage follows
+// the imaging literature; AD and LBD spread along different anatomical paths. Illustrative.
+
+const NETWORKS = [
+  { key: "VIS", name: "Visual",            color: "#a56bf0", regions: ["V1 · Primary Visual","V2","V3","Lingual","Cuneus","Fusiform","Lateral Occipital","Calcarine"] },
+  { key: "SMN", name: "Somatomotor",       color: "#6ea8fe", regions: ["Precentral","Postcentral","Paracentral","SMA","Primary Motor","Primary Sensory","Superior Temporal"] },
+  { key: "DAN", name: "Dorsal Attention",  color: "#3fb950", regions: ["Superior Parietal","Intraparietal Sulcus","Frontal Eye Field","Area MT+","Superior Precentral"] },
+  { key: "VAN", name: "Ventral Attention", color: "#e06c9f", regions: ["Anterior Insula","Dorsal ACC","Temporoparietal Jct","Supramarginal","Frontal Operculum"] },
+  { key: "LIM", name: "Limbic",            color: "#d7b56d", regions: ["Orbitofrontal","Temporal Pole","Entorhinal","Parahippocampal","Amygdala"] },
+  { key: "FPN", name: "Frontoparietal",    color: "#e8833a", regions: ["DLPFC","Inferior Parietal","Middle Frontal","Rostral PFC","Posterior Parietal"] },
+  { key: "DMN", name: "Default Mode",      color: "#ef6f6f", regions: ["mPFC","PCC","Precuneus","Angular Gyrus","Lateral Temporal","Hippocampus","Retrosplenial"] },
+];
+const HUBS = new Set(["Anterior Insula","Dorsal ACC","DLPFC","mPFC","PCC","Precuneus","Superior Parietal","Inferior Parietal"]);
+const netByKey = Object.fromEntries(NETWORKS.map((n) => [n.key, n]));
+
+// disease-involvement curve per network: [onset, ceiling] for AD and LBD (stage & severity 0..1)
+const NET_SEV = {
+  VIS: { ad: [0.70, 0.30], lbd: [0.16, 0.85] },
+  SMN: { ad: [0.75, 0.20], lbd: [0.55, 0.40] },
+  DAN: { ad: [0.48, 0.55], lbd: [0.42, 0.50] },
+  VAN: { ad: [0.46, 0.52], lbd: [0.34, 0.58] },
+  LIM: { ad: [0.12, 0.90], lbd: [0.48, 0.48] },
+  FPN: { ad: [0.50, 0.55], lbd: [0.46, 0.50] },
+  DMN: { ad: [0.28, 0.88], lbd: [0.42, 0.55] },
+};
+// region-specific overrides (the anatomically-earliest / signature regions)
+const OVERRIDE = {
+  "Entorhinal":       { ad: [0.08, 1.00] },
+  "Parahippocampal":  { ad: [0.12, 0.95] },
+  "Amygdala":         { ad: [0.20, 0.85], lbd: [0.40, 0.60] },
+  "Hippocampus":      { ad: [0.12, 0.95], lbd: [0.55, 0.45] },
+  "PCC":              { ad: [0.30, 0.92] },
+  "Precuneus":        { ad: [0.30, 0.90] },
+  "Lateral Occipital":{ lbd: [0.12, 0.92] },
+  "Calcarine":        { lbd: [0.14, 0.88] },
+  "Lingual":          { lbd: [0.15, 0.85] },
+};
+
+// deterministic PRNG so graph is identical across loads
+function mulberry32(a){return function(){a|=0;a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const rng = mulberry32(20260716);
+
+// build nodes with disease curves
+const nodes = [];
+NETWORKS.forEach((net) => net.regions.forEach((label) => {
+  const base = NET_SEV[net.key], ov = OVERRIDE[label] || {};
+  nodes.push({
+    id: net.key + "·" + label, label, net: net.key, color: net.color, hub: HUBS.has(label),
+    ad: ov.ad || base.ad, lbd: ov.lbd || base.lbd,
+  });
+}));
+const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+
+// build links (same schematic modular + rich-club connectome as the network demo)
+const links = [];
+const addLink = (a, b, within, w) => links.push({ source: a.id, target: b.id, within, w });
+for (const net of NETWORKS) {
+  const reg = nodes.filter((n) => n.net === net.key);
+  for (let i = 0; i < reg.length; i++) for (let j = i + 1; j < reg.length; j++) {
+    const p = reg[i].hub || reg[j].hub ? 0.7 : 0.42;
+    if (rng() < p) addLink(reg[i], reg[j], true, 0.55 + 0.45 * rng());
+  }
+}
+const hubs = nodes.filter((n) => n.hub);
+for (const h of hubs) {
+  const others = nodes.filter((n) => n.net !== h.net);
+  const k = 3 + Math.floor(rng() * 3); const picks = new Set(); let guard = 0;
+  while (picks.size < k && guard++ < 40) {
+    const pool = rng() < 0.6 ? others.filter((n) => n.hub) : others;
+    const cand = pool[Math.floor(rng() * pool.length)];
+    if (cand && cand.id !== h.id) picks.add(cand.id);
+  }
+  picks.forEach((id) => addLink(h, byId[id], false, 0.18 + 0.32 * rng()));
+}
+const degRaw = {}; links.forEach((l) => { degRaw[l.source]=(degRaw[l.source]||0)+1; degRaw[l.target]=(degRaw[l.target]||0)+1; });
+for (const n of nodes) if (!degRaw[n.id]) { const m = nodes.find((x) => x.net===n.net && x.id!==n.id); if (m){addLink(n,m,true,0.6);degRaw[n.id]=1;} }
+const degree = {}; links.forEach((l) => { degree[l.source]=(degree[l.source]||0)+1; degree[l.target]=(degree[l.target]||0)+1; });
+nodes.forEach((n) => { n.deg = degree[n.id]||0; n.baseR = 5 + Math.min(n.deg,9)*1.5 + (n.hub?2:0); });
+
+const STAGES = [[0,"Cognitively normal"],[0.16,"Early MCI"],[0.36,"Late MCI"],[0.56,"Mild dementia"],[0.80,"Moderate–severe dementia"]];
+
+const $ = (id) => document.getElementById(id);
+const svgEl = $("graph"), seg = $("seg"), stageEl = $("stage"), legendEl = $("legend"), leadingEl = $("leading");
+let d3 = null, sim = null, nodeSel = null, linkSel = null, disease = "AD";
+
+function severity(s, curve) { const [o,m]=curve; if(s<=o)return 0; const t=(s-o)/(1-o); return Math.pow(Math.max(0,Math.min(1,t)),0.75)*m; }
+function ease(s){ return Math.pow(s,1.08); }
+function stageName(s){ let n=STAGES[0][1]; for(const [t,nm] of STAGES) if(s>=t) n=nm; return n; }
+
+init();
+async function init() {
+  try { d3 = await import("https://cdn.jsdelivr.net/npm/d3@7/+esm"); }
+  catch(e){ svgEl.outerHTML = `<div style="padding:40px;text-align:center;color:#f85149">Couldn't load D3 (are you online?)</div>`; return; }
+  buildLegend();
+  buildGraph();
+  seg.addEventListener("click", (e) => { const b=e.target.closest("button"); if(!b)return; disease=b.dataset.d; seg.querySelectorAll("button").forEach((x)=>x.classList.toggle("on",x===b)); update(); });
+  stageEl.addEventListener("input", update);
+  update();
+}
+
+function buildGraph() {
+  const svg = d3.select(svgEl); svg.selectAll("*").remove();
+  const w = svgEl.clientWidth || 640, h = svgEl.clientHeight || 480;
+  const cx=w/2, cy=h/2, R=Math.min(w,h)*0.34;
+  NETWORKS.forEach((net,i) => { const a=(i/NETWORKS.length)*2*Math.PI - Math.PI/2; net.cx=cx+R*Math.cos(a); net.cy=cy+R*Math.sin(a); });
+
+  const g = svg.append("g");
+  svg.call(d3.zoom().scaleExtent([0.4,3]).on("zoom",(e)=>g.attr("transform",e.transform))).on("dblclick.zoom",null);
+
+  linkSel = g.append("g").selectAll("line").data(links).join("line").attr("class","link").attr("stroke-width",(d)=>d.within?1.1:0.8);
+  nodeSel = g.append("g").selectAll("g").data(nodes).join("g").attr("class","node");
+  nodeSel.append("circle");
+  nodeSel.append("text").attr("dy","0.32em").text((d)=>d.label);
+  nodeSel.call(d3.drag()
+    .on("start",(e,d)=>{ if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; })
+    .on("end",(e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+  nodeSel.on("click",(e,d)=>{ e.stopPropagation(); showInfo(d); });
+
+  sim = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id((d)=>d.id).distance((l)=>l.within?30:92).strength((l)=>l.within?0.22:0.05))
+    .force("charge", d3.forceManyBody().strength(-150))
+    .force("x", d3.forceX((d)=>netByKey[d.net].cx).strength(0.12))
+    .force("y", d3.forceY((d)=>netByKey[d.net].cy).strength(0.12))
+    .force("collide", d3.forceCollide().radius((d)=>d.baseR+3))
+    .on("tick", () => {
+      linkSel.attr("x1",(d)=>d.source.x).attr("y1",(d)=>d.source.y).attr("x2",(d)=>d.target.x).attr("y2",(d)=>d.target.y);
+      nodeSel.attr("transform",(d)=>`translate(${d.x},${d.y})`);
+    });
+}
+
+// recolour graph + readouts for the current disease & stage
+function update() {
+  const s = +stageEl.value / 100;
+  const cur = disease === "AD" ? "ad" : "lbd";
+  nodes.forEach((n) => { n.sev = severity(s, n[cur]); });
+
+  $("stageName").textContent = stageName(s);
+  $("mmse").textContent = Math.round(30 - 20*ease(s));
+  $("cdr").textContent = (16*ease(s)).toFixed(1);
+  $("sideTitle").textContent = `Most-involved regions — ${disease}`;
+
+  if (nodeSel) {
+    nodeSel.select("circle")
+      .attr("r", (d) => d.baseR * (1 - 0.22 * d.sev))
+      .attr("fill", (d) => d3.interpolateRgb(d.color, "#ef4444")(Math.min(1, d.sev)))
+      .attr("stroke-width", (d) => 1.2 + d.sev * 1.4)
+      .attr("stroke", (d) => (d.sev > 0.5 ? "#ef4444" : "#0a0e16"));
+    nodeSel.classed("show", (d) => d.sev > 0.45);
+    linkSel.attr("stroke-opacity", (d) => {
+      const sv = Math.max(byId[d.source.id || d.source].sev, byId[d.target.id || d.target].sev);
+      return (d.within ? 0.55 : 0.4) * (1 - 0.7 * sv);
+    });
+  }
+
+  // leading regions panel
+  const top = [...nodes].sort((a,b)=>b.sev-a.sev).slice(0,6);
+  leadingEl.innerHTML = top.map((n) => {
+    const col = colorFor(n.sev);
+    return `<div class="lr-row"><div class="lr-name"><span>${esc(n.label.replace(/ · .*/,""))}</span><span>${Math.round(n.sev*100)}%</span></div>`
+      + `<div class="lr-track"><div class="lr-fill" style="width:${(n.sev*100).toFixed(0)}%;background:${col}"></div></div></div>`;
+  }).join("");
+
+  $("interp").innerHTML = interpret(s, top);
+}
+
+function colorFor(sev){ return sev < 0.02 ? "var(--muted)" : "#ef4444"; }
+function interpret(s, top) {
+  if (s < 0.14) return `Near the healthy end of the continuum — the network is intact and cognition is preserved.`;
+  const names = top.filter((n)=>n.sev>0.1).slice(0,2).map((n)=>n.label.replace(/ · .*/,"").replace(/ \(.*/,""));
+  const lead = names.length ? `<b>${names.join("</b>, <b>")}</b>` : "several regions";
+  if (disease === "AD")
+    return `Alzheimer's atrophy starts in the medial temporal lobe and spreads through the default-mode network; occipital and sensorimotor cortex are relatively spared. Leading now: ${lead}.`;
+  return `In Lewy body dementia the hippocampus is relatively spared early, while occipital and subcortical/attention systems are hit sooner — a different path along the same axis. Leading now: ${lead}.`;
+}
+
+function showInfo(d) {
+  const net = netByKey[d.net];
+  const box = document.createElement("div");
+  // reuse the legend as a transient info line via title; simplest: alert-free inline update
+  $("interp").innerHTML = `<b>${esc(d.label)}</b> — ${esc(net.name)} network. Involvement at this stage: <b>${Math.round((d.sev||0)*100)}%</b>${d.hub ? " · connector hub" : ""}.`;
+}
+
+function buildLegend() {
+  legendEl.innerHTML = NETWORKS.map((n)=>`<div class="row"><i style="background:${n.color}"></i>${esc(n.name)}</div>`).join("")
+    + `<div class="row sep"><span class="grad"></span>&nbsp;involvement</div>`;
+}
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  </script>
+</body>
+</html>
