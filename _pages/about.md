@@ -40,4 +40,4 @@ Before UTA, I received my M.S. and B.S. in Computer Science from Kennesaw State 
 
 **I am on the job market for faculty and postdoctoral positions starting in 2027.** Feel free to reach out!
 
-On the side, I build interactive, in-browser **AI/ML demos** — LLM chat, agent reasoning, a from-scratch neural network, semantic search, and more. [**Explore the demos →**](/demos/)
+On the side, I build interactive, in-browser **AI/ML projects** — LLM chat, agent reasoning, a from-scratch neural network, semantic search, and more. [**Explore the projects →**](/projects/)

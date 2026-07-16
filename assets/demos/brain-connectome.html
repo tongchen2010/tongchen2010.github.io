@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brain Connectome Explorer — interactive functional brain networks</title>
+  <meta name="description" content="Explore the human brain as a network: regions grouped into the seven canonical functional networks, with an edge-weight threshold, subnetwork isolation, hub sizing, and an Alzheimer's-implicated overlay. Runs entirely in your browser." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='11' cy='16' r='9' fill='%236ea8fe'/><circle cx='21' cy='16' r='9' fill='%23ef6f6f' fill-opacity='0.85'/></svg>" />
+  <style>
+:root {
+  --bg: #0b0f17; --panel: #131927; --panel-2: #1b2336; --border: #273149;
+  --text: #e7ecf5; --muted: #93a0b8; --accent: #6ea8fe; --accent-2: #8b7cff;
+  --radius: 14px; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; min-height: 100%;
+  background: radial-gradient(1200px 600px at 80% -10%, #1a2236 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 920px; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.brand { display: flex; gap: 14px; align-items: center; }
+.logo { font-size: 30px; line-height: 1; filter: drop-shadow(0 0 8px rgba(110,168,254,0.35)); }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: -0.02em; }
+.tagline { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; max-width: 62ch; line-height: 1.5; }
+
+.controls { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+.ctrl { display: flex; flex-direction: column; gap: 6px; }
+.ctrl label { font-size: 0.78rem; color: var(--muted); }
+select {
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 9px; padding: 9px 11px; font-size: 0.9rem; font-family: inherit; min-width: 220px;
+}
+select:focus { outline: none; border-color: var(--accent); }
+.slider-ctrl { min-width: 220px; flex: 1; }
+input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+.slider-val { font-family: var(--mono); color: var(--text); font-size: 0.82rem; }
+.reset { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 9px; padding: 9px 14px; font-size: 0.85rem; cursor: pointer; font-family: inherit; }
+.reset:hover { color: var(--text); border-color: var(--accent); }
+
+.graph-card { position: relative; background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; }
+#graph { width: 100%; height: 560px; display: block; cursor: grab; }
+#graph:active { cursor: grabbing; }
+
+.legend { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 3px;
+  background: rgba(11,15,23,0.72); border: 1px solid var(--border); border-radius: 10px; padding: 8px 9px;
+  font-size: 0.75rem; color: var(--muted); backdrop-filter: blur(4px); max-width: 190px; }
+.legend .row { display: flex; align-items: center; gap: 7px; padding: 2px 4px; border-radius: 6px; cursor: pointer; }
+.legend .row:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+.legend .row.active { background: rgba(255,255,255,0.10); color: var(--text); font-weight: 600; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.legend .cnt { margin-left: auto; opacity: 0.6; font-family: var(--mono); font-size: 0.68rem; }
+
+.info { position: absolute; top: 12px; right: 12px; width: 236px; max-width: 62%;
+  background: rgba(11,15,23,0.9); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+  font-size: 0.84rem; backdrop-filter: blur(4px); }
+.info h3 { margin: 0 0 4px; font-size: 0.98rem; }
+.info .net { color: var(--muted); font-size: 0.78rem; margin: 0 0 8px; }
+.info .stat { color: var(--muted); line-height: 1.55; margin: 3px 0 0; }
+.info .stat b { color: var(--text); font-weight: 600; }
+.info .tag { display: inline-block; margin-top: 8px; font-size: 0.72rem; padding: 2px 8px; border-radius: 20px;
+  border: 1px solid var(--border); color: var(--muted); }
+.info .tag.ad { border-color: #ef6f6f; color: #ef8f8f; }
+.info .tag.hub { border-color: var(--accent); color: var(--accent); }
+
+.hud { position: absolute; bottom: 10px; left: 14px; right: 168px; text-align: left;
+  font-size: 0.75rem; color: var(--muted); pointer-events: none; }
+.statbar { position: absolute; bottom: 10px; right: 14px; font-family: var(--mono);
+  font-size: 0.74rem; color: var(--muted); pointer-events: none; }
+
+.link { stroke: #38445e; }
+.node circle { stroke: #0a0e16; stroke-width: 1.3px; cursor: pointer; }
+.node text { fill: var(--text); font-size: 10px; pointer-events: none; paint-order: stroke;
+  stroke: #0b0f17; stroke-width: 3px; stroke-linejoin: round; opacity: 0; }
+.node.big text, .node.show-label text { opacity: 0.92; }
+.dim { opacity: 0.08 !important; }
+.dim-link { opacity: 0.04 !important; }
+
+.pagefoot { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 2px 0 8px; line-height: 1.55; }
+a { color: var(--accent); }
+@media (max-width: 560px) {
+  #graph { height: 460px; } .info { width: 150px; } .legend { font-size: 0.68rem; max-width: 150px; }
+  .controls { gap: 12px; } select, .slider-ctrl { min-width: 150px; }
+  .hud { display: none; }
+}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">🧠</span>
+        <div>
+          <h1>Brain Connectome Explorer</h1>
+          <p class="tagline">The human brain as a <strong>network</strong> — regions grouped into the seven canonical functional networks. Drag nodes, raise the connection threshold to watch the networks separate, isolate a subnetwork, or highlight the regions most affected in Alzheimer's.</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="controls">
+      <div class="ctrl">
+        <label for="highlight">Highlight</label>
+        <select id="highlight"></select>
+      </div>
+      <div class="ctrl slider-ctrl">
+        <label for="thresh">Connection threshold — <span class="slider-val" id="threshVal">0.00</span></label>
+        <input id="thresh" type="range" min="0" max="0.85" step="0.01" value="0" />
+      </div>
+      <button class="reset" id="reset">Reset</button>
+    </section>
+
+    <main class="graph-card">
+      <svg id="graph" role="img" aria-label="Brain connectome graph"></svg>
+      <div class="legend" id="legend"></div>
+      <div class="info" id="info" hidden></div>
+      <div class="hud">Drag nodes · scroll to zoom · click a region for its connections · click a network in the legend to isolate it</div>
+      <div class="statbar" id="statbar"></div>
+    </main>
+
+    <footer class="pagefoot">
+      <span>Regions are grouped into the seven canonical functional networks (Yeo et&nbsp;al., 2011). The connectivity here is a <strong>schematic illustration</strong> of the brain's modular, small-world, hub-organized topology — not a single subject's scan. Node size reflects each region's degree (its hub-ness). Built with D3; runs entirely in your browser.</span>
+    </footer>
+  </div>
+
+  <script type="module">
+// Brain Connectome Explorer — the brain rendered as an interactive functional network.
+// Regions belong to the 7 canonical resting-state networks (Yeo 2011). Connectivity is a
+// schematic model of modular / rich-club brain organization (deterministic, seeded) so the
+// demo always works offline and looks the same on every load.
+
+// ---------- network + region definitions ----------
+const NETWORKS = [
+  { key: "VIS", name: "Visual",            color: "#a56bf0",
+    regions: ["V1 · Primary Visual", "V2", "V3", "Lingual", "Cuneus", "Fusiform", "Lateral Occipital", "Calcarine"] },
+  { key: "SMN", name: "Somatomotor",       color: "#6ea8fe",
+    regions: ["Precentral", "Postcentral", "Paracentral", "SMA", "Primary Motor", "Primary Sensory", "Superior Temporal"] },
+  { key: "DAN", name: "Dorsal Attention",  color: "#3fb950",
+    regions: ["Superior Parietal", "Intraparietal Sulcus", "Frontal Eye Field", "Area MT+", "Superior Precentral"] },
+  { key: "VAN", name: "Ventral Attention", color: "#e06c9f",
+    regions: ["Anterior Insula", "Dorsal ACC", "Temporoparietal Jct", "Supramarginal", "Frontal Operculum"] },
+  { key: "LIM", name: "Limbic",            color: "#d7b56d",
+    regions: ["Orbitofrontal", "Temporal Pole", "Entorhinal", "Parahippocampal", "Amygdala"] },
+  { key: "FPN", name: "Frontoparietal",    color: "#e8833a",
+    regions: ["DLPFC", "Inferior Parietal", "Middle Frontal", "Rostral PFC", "Posterior Parietal"] },
+  { key: "DMN", name: "Default Mode",      color: "#ef6f6f",
+    regions: ["mPFC", "PCC", "Precuneus", "Angular Gyrus", "Lateral Temporal", "Hippocampus", "Retrosplenial"] },
+];
+// connector hubs (rich club) — carry long-range, cross-network links
+const HUBS = new Set(["Anterior Insula", "Dorsal ACC", "DLPFC", "mPFC", "PCC", "Precuneus", "Superior Parietal", "Inferior Parietal"]);
+// regions with early / prominent involvement in Alzheimer's disease
+const AD = new Set(["Entorhinal", "Parahippocampal", "Amygdala", "Hippocampus", "mPFC", "PCC", "Precuneus", "Angular Gyrus", "Retrosplenial"]);
+
+const netByKey = Object.fromEntries(NETWORKS.map((n) => [n.key, n]));
+
+// ---------- deterministic PRNG so the graph is stable across loads ----------
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rng = mulberry32(20260716);
+
+// ---------- build nodes ----------
+const nodes = [];
+NETWORKS.forEach((net) => {
+  net.regions.forEach((label) => {
+    nodes.push({
+      id: net.key + "·" + label, label, net: net.key, color: net.color,
+      hub: HUBS.has(label), ad: AD.has(label),
+    });
+  });
+});
+const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+
+// ---------- build links (schematic modular + rich-club connectome) ----------
+const links = [];
+const addLink = (a, b, within, w) => links.push({ source: a.id, target: b.id, within, w });
+
+// within-network edges — dense, strong
+for (const net of NETWORKS) {
+  const reg = nodes.filter((n) => n.net === net.key);
+  for (let i = 0; i < reg.length; i++)
+    for (let j = i + 1; j < reg.length; j++) {
+      const p = reg[i].hub || reg[j].hub ? 0.7 : 0.42;
+      if (rng() < p) addLink(reg[i], reg[j], true, 0.55 + 0.45 * rng());
+    }
+}
+// between-network edges — sparse, weaker, routed through hubs (rich club)
+const hubs = nodes.filter((n) => n.hub);
+for (const h of hubs) {
+  const others = nodes.filter((n) => n.net !== h.net);
+  const k = 3 + Math.floor(rng() * 3);
+  const picks = new Set();
+  let guard = 0;
+  while (picks.size < k && guard++ < 40) {
+    // bias toward other hubs
+    const pool = rng() < 0.6 ? others.filter((n) => n.hub) : others;
+    const cand = pool[Math.floor(rng() * pool.length)];
+    if (cand && cand.id !== h.id) picks.add(cand.id);
+  }
+  picks.forEach((id) => addLink(h, byId[id], false, 0.18 + 0.32 * rng()));
+}
+// guarantee no isolated node
+const degRaw = {};
+links.forEach((l) => { degRaw[l.source] = (degRaw[l.source] || 0) + 1; degRaw[l.target] = (degRaw[l.target] || 0) + 1; });
+for (const n of nodes) {
+  if (!degRaw[n.id]) {
+    const mate = nodes.find((m) => m.net === n.net && m.id !== n.id);
+    if (mate) { addLink(n, mate, true, 0.6); degRaw[n.id] = 1; }
+  }
+}
+// full-graph degree -> node radius (stable regardless of threshold)
+const degree = {};
+links.forEach((l) => { degree[l.source] = (degree[l.source] || 0) + 1; degree[l.target] = (degree[l.target] || 0) + 1; });
+nodes.forEach((n) => { n.deg = degree[n.id] || 0; n.r = 5 + Math.min(n.deg, 9) * 1.5 + (n.hub ? 2 : 0); });
+
+// ---------- DOM ----------
+const $ = (id) => document.getElementById(id);
+const svgEl = $("graph"), legendEl = $("legend"), infoEl = $("info"),
+  highlightSel = $("highlight"), threshEl = $("thresh"), threshVal = $("threshVal"),
+  statbar = $("statbar"), resetBtn = $("reset");
+
+let d3 = null, sim = null, nodeSel = null, linkSel = null;
+let state = { highlight: "all", thresh: 0, focusId: null };
+
+// ---------- boot ----------
+init();
+async function init() {
+  // highlight dropdown
+  const optAll = new Option("All networks", "all"); highlightSel.add(optAll);
+  const gNet = document.createElement("optgroup"); gNet.label = "Isolate a functional network";
+  NETWORKS.forEach((n) => gNet.appendChild(new Option(n.name, "net:" + n.key)));
+  highlightSel.add(gNet);
+  const gClin = document.createElement("optgroup"); gClin.label = "Clinical";
+  gClin.appendChild(new Option("Alzheimer's-implicated regions", "ad"));
+  highlightSel.add(gClin);
+
+  try {
+    d3 = await import("https://cdn.jsdelivr.net/npm/d3@7/+esm");
+  } catch (e) {
+    svgEl.outerHTML = `<div style="padding:40px;text-align:center;color:#f85149">Couldn't load D3 (are you online?)</div>`;
+    return;
+  }
+  buildLegend();
+  render();
+
+  highlightSel.addEventListener("change", () => { state.highlight = highlightSel.value; state.focusId = null; applyView(); });
+  threshEl.addEventListener("input", () => { state.thresh = +threshEl.value; threshVal.textContent = state.thresh.toFixed(2); applyThreshold(); });
+  resetBtn.addEventListener("click", reset);
+}
+
+function reset() {
+  state = { highlight: "all", thresh: 0, focusId: null };
+  highlightSel.value = "all"; threshEl.value = "0"; threshVal.textContent = "0.00";
+  applyThreshold(); applyView();
+}
+
+// ---------- rendering ----------
+function render() {
+  const svg = d3.select(svgEl);
+  svg.selectAll("*").remove();
+  const w = svgEl.clientWidth || 880, h = svgEl.clientHeight || 560;
+
+  // network centroids on a circle -> modular layout
+  const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.32;
+  NETWORKS.forEach((net, i) => {
+    const a = (i / NETWORKS.length) * 2 * Math.PI - Math.PI / 2;
+    net.cx = cx + R * Math.cos(a); net.cy = cy + R * Math.sin(a);
+  });
+
+  const g = svg.append("g");
+  const zoom = d3.zoom().scaleExtent([0.4, 3]).on("zoom", (e) => g.attr("transform", e.transform));
+  svg.call(zoom).on("dblclick.zoom", null);
+
+  linkSel = g.append("g").selectAll("line").data(links).join("line")
+    .attr("class", "link").attr("stroke-width", (d) => (d.within ? 1.1 : 0.8))
+    .attr("stroke-opacity", (d) => (d.within ? 0.55 : 0.4));
+
+  nodeSel = g.append("g").selectAll("g").data(nodes).join("g")
+    .attr("class", (d) => "node" + (d.r >= 9 ? " big" : ""));
+  nodeSel.append("circle").attr("r", (d) => d.r).attr("fill", (d) => d.color);
+  nodeSel.append("text").attr("x", (d) => d.r + 3).attr("dy", "0.32em").text((d) => d.label);
+
+  nodeSel.call(d3.drag()
+    .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  nodeSel.on("click", (e, d) => { e.stopPropagation(); focusNode(d); });
+  svg.on("click", () => { state.focusId = null; infoEl.hidden = true; applyView(); });
+
+  sim = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id((d) => d.id)
+      .distance((l) => (l.within ? 30 : 92)).strength((l) => (l.within ? 0.22 : 0.05)))
+    .force("charge", d3.forceManyBody().strength(-150))
+    .force("x", d3.forceX((d) => netByKey[d.net].cx).strength(0.12))
+    .force("y", d3.forceY((d) => netByKey[d.net].cy).strength(0.12))
+    .force("collide", d3.forceCollide().radius((d) => d.r + 3))
+    .on("tick", () => {
+      linkSel.attr("x1", (d) => d.source.x).attr("y1", (d) => d.source.y)
+        .attr("x2", (d) => d.target.x).attr("y2", (d) => d.target.y);
+      nodeSel.attr("transform", (d) => `translate(${d.x},${d.y})`);
+    });
+
+  applyThreshold();
+  applyView();
+}
+
+// ---------- threshold (edge sparsification) ----------
+function applyThreshold() {
+  if (!linkSel) return;
+  let shown = 0;
+  linkSel.style("display", (d) => {
+    const vis = d.w >= state.thresh;
+    if (vis) shown++;
+    return vis ? null : "none";
+  });
+  updateStatbar(shown);
+}
+
+// ---------- highlight / focus ----------
+function inHighlight(n) {
+  if (state.highlight === "all") return true;
+  if (state.highlight === "ad") return n.ad;
+  if (state.highlight.startsWith("net:")) return n.net === state.highlight.slice(4);
+  return true;
+}
+
+function applyView() {
+  if (!nodeSel) return;
+  legendEl.querySelectorAll(".row").forEach((r) =>
+    r.classList.toggle("active", r.dataset.key && state.highlight === "net:" + r.dataset.key));
+
+  if (state.focusId) { focusNeighbors(state.focusId); return; }
+
+  const on = (n) => inHighlight(n);
+  nodeSel.classed("dim", (n) => !on(n)).classed("show-label", (n) => on(n) && state.highlight !== "all");
+  linkSel.classed("dim-link", (l) => !(on(l.source) && on(l.target)));
+
+  let cnt = nodes.filter(on).length;
+  if (state.highlight === "all") { infoEl.hidden = true; }
+  else showViewInfo(cnt);
+  updateStatbar();
+}
+
+function focusNode(d) {
+  state.focusId = d.id;
+  focusNeighbors(d.id);
+  const conns = links.filter((l) => (l.source.id === d.id || l.target.id === d.id) && l.w >= state.thresh);
+  const net = netByKey[d.net];
+  infoEl.hidden = false;
+  infoEl.innerHTML =
+    `<h3>${esc(d.label)}</h3>` +
+    `<p class="net"><span style="color:${net.color}">●</span> ${esc(net.name)} network</p>` +
+    `<p class="stat"><b>${d.deg}</b> total connections</p>` +
+    `<p class="stat"><b>${conns.length}</b> shown at current threshold</p>` +
+    (d.hub ? `<span class="tag hub">connector hub</span> ` : "") +
+    (d.ad ? `<span class="tag ad">Alzheimer's-implicated</span>` : "");
+}
+
+function focusNeighbors(id) {
+  const nbr = new Set([id]);
+  links.forEach((l) => {
+    const s = l.source.id || l.source, t = l.target.id || l.target;
+    if (l.w < state.thresh) return;
+    if (s === id) nbr.add(t);
+    if (t === id) nbr.add(s);
+  });
+  nodeSel.classed("dim", (n) => !nbr.has(n.id)).classed("show-label", (n) => nbr.has(n.id));
+  linkSel.classed("dim-link", (l) => !(l.source.id === id || l.target.id === id));
+}
+
+function showViewInfo(cnt) {
+  let title, sub;
+  if (state.highlight === "ad") {
+    title = "Alzheimer's-implicated";
+    sub = "Default-mode and medial-temporal regions with early, prominent involvement in AD — the memory and default-mode systems degrade first.";
+  } else {
+    const net = netByKey[state.highlight.slice(4)];
+    title = net.name + " network";
+    sub = "One functional subnetwork isolated from the whole-brain graph.";
+  }
+  infoEl.hidden = false;
+  infoEl.innerHTML = `<h3>${esc(title)}</h3><p class="net"><b>${cnt}</b> regions</p><p class="stat">${esc(sub)}</p>`;
+}
+
+function updateStatbar(shownArg) {
+  let shown = shownArg;
+  if (shown == null) {
+    shown = 0; links.forEach((l) => { if (l.w >= state.thresh) shown++; });
+  }
+  statbar.textContent = `${nodes.length} regions · ${shown} connections`;
+}
+
+// ---------- legend ----------
+function buildLegend() {
+  legendEl.innerHTML = NETWORKS.map((n) => {
+    const c = nodes.filter((x) => x.net === n.key).length;
+    return `<div class="row" data-key="${n.key}"><i style="background:${n.color}"></i>${esc(n.name)}<span class="cnt">${c}</span></div>`;
+  }).join("");
+  legendEl.querySelectorAll(".row").forEach((row) => {
+    row.addEventListener("click", () => {
+      const k = "net:" + row.dataset.key;
+      state.highlight = state.highlight === k ? "all" : k;
+      state.focusId = null;
+      highlightSel.value = state.highlight === k ? k : "all";
+      applyView();
+    });
+  });
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+  </script>
+</body>
+</html>
