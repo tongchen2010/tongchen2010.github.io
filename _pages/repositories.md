@@ -2,7 +2,7 @@
 layout: page
 permalink: /repositories/
 title: repositories
-description: My GitHub profile and open-source repositories.
+description: Open-source code accompanying my papers.
 nav: true
 nav_order: 4
 ---

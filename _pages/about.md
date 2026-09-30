@@ -19,7 +19,7 @@ social: true # includes social icons at the bottom of the page
 
 announcements:
   enabled: true # includes a list of news items
-  scrollable: true # adds a vertical scroll bar if there are more than 3 news items
+  scrollable: false # a fixed-height scroll box clipped items mid-line on mobile
   limit: 5 # leave blank to include all the news in the `_news` folder
 
 latest_posts:
@@ -39,5 +39,20 @@ My work has appeared in *NeuroImage*, **MICCAI**, and **IEEE ISBI**, with multip
 Before UTA, I received my M.S. and B.S. in Computer Science from Kennesaw State University, where I worked on computer vision and deep learning with Dr. Junggab Son and Dr. Jiho Noh.
 
 **I am on the job market for faculty and postdoctoral positions starting in 2027.** Feel free to reach out!
+
+<div style="display:flex;flex-wrap:wrap;gap:0.9rem;justify-content:center;align-items:flex-end;margin:1.4rem 0 0.6rem;">
+  <figure style="flex:1 1 150px;max-width:210px;margin:0;text-align:center;">
+    <img src="/assets/img/research/brain_3hg_lateral.webp" alt="3-hinge gyral landmarks on a reconstructed cortical surface" loading="lazy" style="width:100%;height:150px;object-fit:contain;">
+    <figcaption style="font-size:0.76rem;opacity:0.7;margin-top:0.35rem;line-height:1.35;">3-hinge gyral (3HG) landmarks on the cortical surface</figcaption>
+  </figure>
+  <figure style="flex:1 1 150px;max-width:210px;margin:0;text-align:center;">
+    <img src="/assets/img/research/brain_3hg_roi_lateral.webp" alt="3HG landmarks together with atlas regions on the cortical surface" loading="lazy" style="width:100%;height:150px;object-fit:contain;">
+    <figcaption style="font-size:0.76rem;opacity:0.7;margin-top:0.35rem;line-height:1.35;">Fine-grained landmarks and atlas regions</figcaption>
+  </figure>
+  <figure style="flex:1 1 150px;max-width:210px;margin:0;text-align:center;">
+    <img src="/assets/img/research/brain_3hg_roi_top.webp" alt="Superior view of 3HG landmarks and atlas regions" loading="lazy" style="width:100%;height:150px;object-fit:contain;">
+    <figcaption style="font-size:0.76rem;opacity:0.7;margin-top:0.35rem;line-height:1.35;">Superior view</figcaption>
+  </figure>
+</div>
 
 On the side, I build interactive, in-browser **AI/ML projects** — LLM chat, agent reasoning, a from-scratch neural network, semantic search, and more. [**Explore the projects →**](/projects/)

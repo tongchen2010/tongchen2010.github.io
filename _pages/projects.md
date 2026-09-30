@@ -12,14 +12,14 @@ A few things I've built. **Featured research projects** are pieces of my own wor
 ### Featured research projects
 
 <div style="display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;margin-top:1.1rem;">
-  <div style="flex:1 1 150px;min-height:118px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.45rem;padding:1.1rem;background:linear-gradient(135deg,rgba(139,124,255,0.22),rgba(110,168,254,0.20));text-align:center;">
-    <div style="font-size:1.1rem;font-weight:700;letter-spacing:-0.01em;">MICCAI 2026</div>
-    <div style="font-size:0.68rem;opacity:0.9;border:1px solid rgba(128,128,128,0.5);border-radius:20px;padding:2px 10px;">Early accept · top 9%</div>
-  </div>
+  <a href="/assets/img/research/hilograph_fig1.webp" target="_blank" rel="noopener" title="Open full-size figure" style="flex:1.35 1 240px;position:relative;display:flex;align-items:center;justify-content:center;background:#fff;padding:1.9rem 0.7rem 0.7rem;min-height:170px;">
+    <img src="/assets/img/research/hilograph_fig1.webp" alt="HiLoGraph framework overview: multi-scale brain graph construction and model architecture" loading="lazy" style="width:100%;height:auto;max-height:240px;object-fit:contain;display:block;">
+    <span style="position:absolute;top:8px;left:8px;font-size:0.66rem;font-weight:600;letter-spacing:0.01em;background:rgba(24,24,36,0.82);color:#fff;border-radius:20px;padding:2px 10px;">MICCAI 2026 · Early accept · top 9%</span>
+  </a>
   <div style="flex:3 1 300px;padding:1.05rem 1.25rem;">
     <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.6;">Research Project · first author</div>
     <strong style="display:block;font-size:1.04rem;margin:0.28rem 0 0.4rem;line-height:1.3;">HiLoGraph — Hierarchical-Longitudinal Brain Network Representation Learning</strong>
-    <div style="font-size:0.88em;opacity:0.78;line-height:1.55;">Brain changes in neurodegeneration play out at many spatial scales — regions, subnetworks, the whole brain — and over time across longitudinal scans. HiLoGraph is a graph representation-learning framework that models both at once: a hierarchical view of the brain network, learned jointly across longitudinal timepoints, for tracking disease progression.</div>
+    <div style="font-size:0.88em;opacity:0.78;line-height:1.55;">HiLoGraph encodes brain networks at two scales — fine-grained 3-hinge gyral landmarks and atlas regions, built from cortical morphology and structural connectivity — into one shared latent space, with longitudinal constraints across each subject's repeated scans. Trained only on healthy adults, this space serves as a normative reference of brain aging: a patient's deviation from it separates cognitively normal, Alzheimer's disease and Lewy body dementia without any disease-specific fine-tuning.</div>
     <div style="margin-top:0.7rem;font-size:0.85em;">
       <a href="/publications/#chen2026hilograph">Paper</a> ·
       <a href="https://github.com/tongchen2010/hilograph" target="_blank" rel="noopener">Code</a>
@@ -28,10 +28,10 @@ A few things I've built. **Featured research projects** are pieces of my own wor
 </div>
 
 <div style="display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;margin-top:1rem;">
-  <div style="flex:1 1 150px;min-height:118px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.45rem;padding:1.1rem;background:linear-gradient(135deg,rgba(63,185,80,0.20),rgba(86,199,199,0.20));text-align:center;">
-    <div style="font-size:1.1rem;font-weight:700;letter-spacing:-0.01em;">MICCAI 2025</div>
-    <div style="font-size:0.68rem;opacity:0.9;border:1px solid rgba(128,128,128,0.5);border-radius:20px;padding:2px 10px;">Early accept · top 9%</div>
-  </div>
+  <a href="/assets/img/research/staging_continuum.webp" target="_blank" rel="noopener" title="Open full-size figure" style="flex:1.35 1 240px;position:relative;display:flex;align-items:center;justify-content:center;background:#fff;padding:1.9rem 0.7rem 0.7rem;min-height:170px;">
+    <img src="/assets/img/research/staging_continuum.webp" alt="Continuous staging tree placing CN, MCI, AD and LBD along one continuum" loading="lazy" style="width:100%;height:auto;max-height:240px;object-fit:contain;display:block;">
+    <span style="position:absolute;top:8px;left:8px;font-size:0.66rem;font-weight:600;letter-spacing:0.01em;background:rgba(24,24,36,0.82);color:#fff;border-radius:20px;padding:2px 10px;">MICCAI 2025 · Early accept · top 9%</span>
+  </a>
   <div style="flex:3 1 300px;padding:1.05rem 1.25rem;">
     <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.6;">Research Project · first author</div>
     <strong style="display:block;font-size:1.04rem;margin:0.28rem 0 0.4rem;line-height:1.3;">A Unified Continuous Staging Framework for Alzheimer's Disease &amp; Lewy Body Dementia</strong>
@@ -44,10 +44,10 @@ A few things I've built. **Featured research projects** are pieces of my own wor
 </div>
 
 <div style="display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(128,128,128,0.28);border-radius:12px;overflow:hidden;margin-top:1rem;">
-  <div style="flex:1 1 150px;min-height:118px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.45rem;padding:1.1rem;background:linear-gradient(135deg,rgba(232,131,58,0.20),rgba(215,181,109,0.20));text-align:center;">
-    <div style="font-size:1.1rem;font-weight:700;letter-spacing:-0.01em;">AAIC 2025</div>
-    <div style="font-size:0.68rem;opacity:0.9;border:1px solid rgba(128,128,128,0.5);border-radius:20px;padding:2px 10px;">Alzheimer's &amp; Dementia</div>
-  </div>
+  <a href="/assets/img/research/det_fig1.webp" target="_blank" rel="noopener" title="Open full-size figure" style="flex:1.35 1 240px;position:relative;display:flex;align-items:center;justify-content:center;background:#fff;padding:1.9rem 0.7rem 0.7rem;min-height:170px;">
+    <img src="/assets/img/research/det_fig1.webp" alt="Disease Embedding Tree method overview: 3HG features, MMSE-guided embedding and the disease tree" loading="lazy" style="width:100%;height:auto;max-height:240px;object-fit:contain;display:block;">
+    <span style="position:absolute;top:8px;left:8px;font-size:0.66rem;font-weight:600;letter-spacing:0.01em;background:rgba(24,24,36,0.82);color:#fff;border-radius:20px;padding:2px 10px;">AAIC 2025 · Alzheimer's &amp; Dementia</span>
+  </a>
   <div style="flex:3 1 300px;padding:1.05rem 1.25rem;">
     <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.6;">Research Project · first author</div>
     <strong style="display:block;font-size:1.04rem;margin:0.28rem 0 0.4rem;line-height:1.3;">Disease Embedding Tree — a Finer-Scale Cortical Representation of the Impairment Continuum</strong>
